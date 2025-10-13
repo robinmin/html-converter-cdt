@@ -1,5 +1,5 @@
 ---
-mylib: major
+html-converter-cdt: major
 ---
 
 Initial release.

@@ -1,4 +1,4 @@
-import { square } from "mylib"
+import { square } from "html-converter-cdt"
 import { expect, it } from "vitest"
 
 it("works", () => {

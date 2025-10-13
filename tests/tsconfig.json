@@ -2,7 +2,7 @@
   "extends": "../tsconfig",
   "compilerOptions": {
     "paths": {
-      "mylib": ["../src"]
+      "html-converter-cdt": ["../src"]
     }
   }
 }
