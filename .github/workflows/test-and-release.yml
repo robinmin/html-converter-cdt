@@ -3,6 +3,8 @@ name: Test and Release
 env:
   # Sync with .changeset/config.json:baseBranch
   MAIN_REF: refs/heads/main
+  # Use custom PAT for changesets action
+  GH_TOKEN: ${{ secrets.GA_TOKEN }}
 
 on:
   push:
@@ -14,10 +16,15 @@ jobs:
   test-and-release:
     name: Test and Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GA_TOKEN }}
 
       - name: Enable corepack
         run: corepack enable
