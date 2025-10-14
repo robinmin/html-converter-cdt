@@ -5,13 +5,10 @@ env:
   MAIN_REF: refs/heads/main
   # Use custom PAT for changesets action
   GH_TOKEN: ${{ secrets.GA_TOKEN }}
-  # Check if this is a tag push
-  IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: ["**"]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -51,7 +48,7 @@ jobs:
         run: pnpm run -r test
 
       - name: Capture new release versions
-        if: ${{ env.IS_TAG == 'true' }}
+        if: ${{ github.ref == env.MAIN_REF }}
         run: |
           if pnpx @changesets/cli status --output=release.json; then
             echo "RELEASE=Version $(jq -r '.releases[0].newVersion' release.json)" >> "$GITHUB_ENV"
@@ -61,7 +58,7 @@ jobs:
           fi
 
       - name: Create Release Pull Request or Publish to npm
-        if: ${{ env.IS_TAG == 'true' }}
+        if: ${{ github.ref == env.MAIN_REF }}
         uses: changesets/action@v1
         with:
           publish: pnpm changeset publish
