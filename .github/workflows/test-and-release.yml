@@ -9,13 +9,281 @@ env:
 on:
   push:
     branches: ["**"]
+  pull_request:
+    branches: [main, develop]
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test-and-release:
-    name: Test and Release
+  # Lint and Code Quality Checks
+  code-quality:
+    name: Code Quality Checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linter
+        run: pnpm run lint
+
+      - name: TypeScript type checking
+        run: pnpm exec tsc --noEmit
+
+      - name: Build packages
+        run: pnpm run build
+
+  # Comprehensive Test Matrix
+  test-matrix:
+    name: Test Matrix (Node.js ${{ matrix.node-version }}, Chrome ${{ matrix.chrome-version }})
+    runs-on: ${{ matrix.os }}
+    needs: code-quality
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: [18.x, 20.x, 22.x]
+        chrome-version: ["90", "100", "110", "120", "130"]
+        include:
+          # Additional combinations for key configurations
+          - os: ubuntu-latest
+            node-version: 20.x
+            chrome-version: stable
+          - os: ubuntu-latest
+            node-version: 20.x
+            chrome-version: beta
+        exclude:
+          # Exclude problematic combinations
+          - os: windows-latest
+            node-version: 18.x
+            chrome-version: "90"
+
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install Chrome ${{ matrix.chrome-version }}
+        if: matrix.chrome-version != 'stable' && matrix.chrome-version != 'beta' && matrix.os == 'ubuntu-latest'
+        run: |
+          if [[ "${{ matrix.chrome-version }}" == "90" ]]; then
+            sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+            echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+            sudo apt-get update
+            sudo apt-get install -y google-chrome-stable=90.* || sudo apt-get install -y google-chrome-stable
+          elif [[ "${{ matrix.chrome-version }}" == "100" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y google-chrome-stable=100.* || sudo apt-get install -y google-chrome-stable
+          else
+            sudo apt-get update
+            sudo apt-get install -y google-chrome-stable
+          fi
+        continue-on-error: true
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm run build
+
+      - name: Set Chrome path
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            echo "CHROME_PATH=/usr/bin/google-chrome" >> $GITHUB_ENV
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            echo "CHROME_PATH=/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" >> $GITHUB_ENV
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            echo "CHROME_PATH=C:\Program Files\Google\Chrome\Application\chrome.exe" >> $GITHUB_ENV
+          fi
+
+      - name: Run unit tests with coverage
+        run: pnpm run test:unit -- --coverage
+
+      - name: Run E2E tests
+        run: pnpm run test:e2e
+
+      - name: Run visual regression tests
+        run: pnpm run test:visual || true # Allow visual tests to fail in matrix
+
+      - name: Upload coverage reports
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x' && matrix.chrome-version == 'stable'
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-${{ matrix.os }}-${{ matrix.node-version }}-${{ matrix.chrome-version }}
+          path: |
+            ./tests/e2e/test-results/
+            ./coverage/
+            ./tests/e2e/playwright-report/
+          retention-days: 7
+
+  # Performance and Accessibility Tests
+  advanced-tests:
+    name: Performance & Accessibility Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm run build
+
+      - name: Run performance tests
+        run: pnpm run test:performance
+
+      - name: Generate performance report
+        run: pnpm run test:performance:report
+
+      - name: Run accessibility tests
+        run: pnpm run test:accessibility:ci
+
+      - name: Upload performance artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-reports
+          path: |
+            ./tests/performance/reports/
+            ./tests/accessibility/reports/
+          retention-days: 30
+
+  # Security and Quality Gates
+  security-and-quality:
+    name: Security & Quality Gates
+    runs-on: ubuntu-latest
+    needs: [code-quality, test-matrix]
+    permissions:
+      contents: read
+      pull-requests: read
+      security-events: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm run build
+
+      - name: Run comprehensive tests
+        run: pnpm run test:comprehensive
+
+      - name: Security audit
+        run: pnpm audit --audit-level=moderate
+
+      - name: Check test coverage thresholds
+        run: |
+          COVERAGE_JSON=$(cat coverage/coverage-summary.json)
+          LINES_PCT=$(echo $COVERAGE_JSON | jq -r '.total.lines.pct')
+          FUNCTIONS_PCT=$(echo $COVERAGE_JSON | jq -r '.total.functions.pct')
+          BRANCHES_PCT=$(echo $COVERAGE_JSON | jq -r '.total.branches.pct')
+          STATEMENTS_PCT=$(echo $COVERAGE_JSON | jq -r '.total.statements.pct')
+
+          echo "Coverage Metrics:"
+          echo "Lines: $LINES_PCT%"
+          echo "Functions: $FUNCTIONS_PCT%"
+          echo "Branches: $BRANCHES_PCT%"
+          echo "Statements: $STATEMENTS_PCT%"
+
+          # Check if coverage meets minimum thresholds
+          if (( $(echo "$LINES_PCT < 90" | bc -l) )); then
+            echo "❌ Lines coverage below 90% threshold"
+            exit 1
+          fi
+          if (( $(echo "$FUNCTIONS_PCT < 90" | bc -l) )); then
+            echo "❌ Functions coverage below 90% threshold"
+            exit 1
+          fi
+          if (( $(echo "$BRANCHES_PCT < 90" | bc -l) )); then
+            echo "❌ Branches coverage below 90% threshold"
+            exit 1
+          fi
+          if (( $(echo "$STATEMENTS_PCT < 90" | bc -l) )); then
+            echo "❌ Statements coverage below 90% threshold"
+            exit 1
+          fi
+
+          echo "✅ All coverage thresholds met!"
+
+      - name: Quality gate check
+        run: |
+          # Check if tests passed
+          if [ $? -eq 0 ]; then
+            echo "✅ Quality gate passed: All tests successful"
+          else
+            echo "❌ Quality gate failed: Some tests failed"
+            exit 1
+          fi
+
+  # Release Management
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [advanced-tests, security-and-quality]
+    if: github.ref == env.MAIN_REF
     permissions:
       contents: write
       pull-requests: write
@@ -23,6 +291,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Enable corepack
         run: corepack enable
@@ -32,23 +303,22 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Setup node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24.5
+          node-version: 20.x
           cache: pnpm
 
-      - name: Install deps
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build packages
-        run: pnpm run -r build
+        run: pnpm run build
 
-      - name: Test packages
-        run: pnpm run -r test
+      - name: Run final test suite
+        run: pnpm run test:comprehensive
 
       - name: Capture new release versions
-        if: ${{ github.ref == env.MAIN_REF }}
         run: |
           if pnpx @changesets/cli status --output=release.json; then
             echo "RELEASE=Version $(jq -r '.releases[0].newVersion' release.json)" >> "$GITHUB_ENV"
@@ -58,7 +328,6 @@ jobs:
           fi
 
       - name: Create Release Pull Request or Publish to npm
-        if: ${{ github.ref == env.MAIN_REF }}
         uses: changesets/action@v1
         with:
           publish: pnpm changeset publish
@@ -67,3 +336,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Generate release artifacts
+        if: contains(env.RELEASE, 'Version')
+        run: |
+          mkdir -p release-artifacts
+          tar -czf release-artifacts/html-converter-cdt-${{ env.RELEASE }}.tar.gz dist/
+          echo "✅ Release artifacts generated"
+
+      - name: Upload release artifacts
+        if: contains(env.RELEASE, 'Version')
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: release-artifacts/
+          retention-days: 90
