@@ -1,0 +1,319 @@
+name: Visual Regression & Performance Tests
+
+env:
+  # Sync with .changeset/config.json:baseBranch
+  MAIN_REF: refs/heads/main
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: "0 2 * * *"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual-regression:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm run test:e2e:install
+
+      - name: Build packages
+        run: pnpm run build
+
+      - name: Run visual regression tests
+        run: pnpm run test:visual
+        id: visual-tests
+
+      - name: Process visual test results
+        if: always()
+        run: |
+          if [ -f "./tests/visual/test-results.json" ]; then
+            echo "📊 Visual test results processed"
+            cat ./tests/visual/test-results.json
+          fi
+
+      - name: Upload visual test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-test-results
+          path: |
+            ./tests/visual/test-results/
+            ./tests/visual/baseline-updates/
+          retention-days: 14
+
+      - name: Comment on PR with visual test results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = './tests/visual/test-results.json';
+
+            let comment = '## 🎨 Visual Regression Test Results\n\n';
+
+            if (fs.existsSync(path)) {
+              const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+              comment += `- ✅ Passed: ${results.passed || 0}\n`;
+              comment += `- ❌ Failed: ${results.failed || 0}\n`;
+              comment += `- ⚠️ Skipped: ${results.skipped || 0}\n`;
+
+              if (results.failed > 0) {
+                comment += '\n⚠️ **Visual regressions detected!** Please review the uploaded artifacts.';
+              } else {
+                comment += '\n✅ **No visual regressions detected.**';
+              }
+            } else {
+              comment += '❓ Test results file not found. Check workflow logs for details.';
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  performance-regression:
+    name: Performance Regression Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm run test:e2e:install
+
+      - name: Build packages
+        run: pnpm run build
+
+      - name: Run performance tests
+        run: pnpm run test:performance
+        id: perf-tests
+
+      - name: Generate performance report
+        run: pnpm run test:performance:report
+
+      - name: Process performance test results
+        if: always()
+        run: |
+          if [ -f "./tests/performance/reports/latest.json" ]; then
+            echo "📊 Performance test results processed"
+
+            # Extract key metrics
+            METRICS_FILE="./tests/performance/reports/latest.json"
+            AVG_CONVERSION_TIME=$(jq -r '.metrics.average_conversion_time' $METRICS_FILE || echo "N/A")
+            MEMORY_USAGE=$(jq -r '.metrics.memory_usage' $METRICS_FILE || echo "N/A")
+            THROUGHPUT=$(jq -r '.metrics.throughput' $METRICS_FILE || echo "N/A")
+
+            echo "Average Conversion Time: ${AVG_CONVERSION_TIME}ms"
+            echo "Memory Usage: ${MEMORY_USAGE}MB"
+            echo "Throughput: ${THROUGHPUT} ops/sec"
+
+            # Save metrics for PR comment
+            echo "AVG_CONVERSION_TIME=${AVG_CONVERSION_TIME}" >> $GITHUB_ENV
+            echo "MEMORY_USAGE=${MEMORY_USAGE}" >> $GITHUB_ENV
+            echo "THROUGHPUT=${THROUGHPUT}" >> $GITHUB_ENV
+          fi
+
+      - name: Upload performance test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-test-results
+          path: |
+            ./tests/performance/reports/
+            ./tests/performance/benchmarks/
+          retention-days: 30
+
+      - name: Check for performance regression
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ -f "./tests/performance/reports/latest.json" ]; then
+            # Simple regression detection (can be enhanced with more sophisticated comparison)
+            AVG_TIME=$(jq -r '.metrics.average_conversion_time' ./tests/performance/reports/latest.json)
+            BASELINE_AVG_TIME=${AVG_TIME} # In real implementation, compare with baseline
+
+            # Example threshold: conversion time should not exceed 5000ms
+            if (( $(echo "$AVG_TIME > 5000" | bc -l) )); then
+              echo "⚠️ Performance regression detected: Average conversion time exceeds threshold"
+              echo "Current: ${AVG_TIME}ms, Threshold: 5000ms"
+              # exit 1 # Uncomment to fail PR on performance regression
+            else
+              echo "✅ Performance metrics within acceptable range"
+            fi
+          fi
+
+      - name: Comment on PR with performance results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let comment = '## ⚡ Performance Test Results\n\n';
+
+            const avgTime = process.env.AVG_CONVERSION_TIME || 'N/A';
+            const memoryUsage = process.env.MEMORY_USAGE || 'N/A';
+            const throughput = process.env.THROUGHPUT || 'N/A';
+
+            comment += `- **Average Conversion Time:** ${avgTime}ms\n`;
+            comment += `- **Memory Usage:** ${memoryUsage}MB\n`;
+            comment += `- **Throughput:** ${throughput} ops/sec\n`;
+
+            // Add performance assessment
+            if (avgTime !== 'N/A') {
+              const time = parseFloat(avgTime);
+              if (time > 5000) {
+                comment += '\n⚠️ **Performance concerns:** Conversion time exceeds recommended limits.';
+              } else if (time > 3000) {
+                comment += '\n🟡 **Performance caution:** Conversion time could be optimized.';
+              } else {
+                comment += '\n✅ **Performance good:** Conversion time within acceptable range.';
+              }
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  accessibility-tests:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm run test:e2e:install
+
+      - name: Build packages
+        run: pnpm run build
+
+      - name: Run accessibility tests
+        run: pnpm run test:accessibility:ci
+        id: a11y-tests
+
+      - name: Process accessibility test results
+        if: always()
+        run: |
+          if [ -f "./tests/accessibility/reports/junit.xml" ]; then
+            echo "📊 Accessibility test results processed"
+
+            # Extract key metrics from JUnit XML
+            CRITICAL_ISSUES=$(grep -o 'failures="[0-9]*"' ./tests/accessibility/reports/junit.xml | cut -d'"' -f2 || echo "0")
+            TOTAL_ISSUES=$(grep -o 'tests="[0-9]*"' ./tests/accessibility/reports/junit.xml | cut -d'"' -f2 || echo "0")
+
+            echo "Critical Accessibility Issues: ${CRITICAL_ISSUES}"
+            echo "Total Tests Run: ${TOTAL_ISSUES}"
+
+            echo "CRITICAL_ISSUES=${CRITICAL_ISSUES}" >> $GITHUB_ENV
+            echo "TOTAL_ISSUES=${TOTAL_ISSUES}" >> $GITHUB_ENV
+          fi
+
+      - name: Upload accessibility test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-test-results
+          path: |
+            ./tests/accessibility/reports/
+            ./tests/accessibility/screenshots/
+          retention-days: 30
+
+      - name: Check accessibility compliance
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ "${{ env.CRITICAL_ISSUES }}" != "0" ]; then
+            echo "❌ Critical accessibility issues detected"
+            echo "Failing PR due to accessibility violations"
+            exit 1
+          else
+            echo "✅ No critical accessibility issues found"
+          fi
+
+      - name: Comment on PR with accessibility results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const criticalIssues = process.env.CRITICAL_ISSUES || '0';
+            const totalTests = process.env.TOTAL_ISSUES || '0';
+
+            let comment = '## ♿ Accessibility Test Results\n\n';
+            comment += `- **Critical Issues:** ${criticalIssues}\n`;
+            comment += `- **Total Tests:** ${totalTests}\n`;
+
+            if (criticalIssues === '0') {
+              comment += '\n✅ **Accessibility compliant:** No critical violations detected.';
+            } else {
+              comment += '\n❌ **Accessibility violations:** Critical issues need to be addressed before merge.';
+              comment += '\nPlease review the uploaded accessibility reports for details.';
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

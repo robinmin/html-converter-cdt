@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-10-15T06:03:24.316Z",
+  "testType": "critical",
+  "wcagLevel": "2.1 AA",
+  "summary": {
+    "total": 1,
+    "violations": 0,
+    "passes": 41,
+    "incomplete": 1,
+    "inapplicable": 48,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0
+  },
+  "violations": [],
+  "incomplete": [
+    {
+      "rule": "color-contrast",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=axeAPI"
+    }
+  ],
+  "compliant": true
+}

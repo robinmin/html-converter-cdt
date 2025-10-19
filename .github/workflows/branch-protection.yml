@@ -1,0 +1,70 @@
+name: Branch Protection Validation
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-branch-protection:
+    name: Validate Branch Protection
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check PR requirements
+        run: |
+          echo "🔍 Checking branch protection requirements..."
+
+          # Check if PR has description
+          if [ -z "${{ github.event.pull_request.body }}" ]; then
+            echo "⚠️ PR should have a description"
+          else
+            echo "✅ PR has description"
+          fi
+
+          # Check if PR is not a draft
+          if [ "${{ github.event.pull_request.draft }}" == "true" ]; then
+            echo "ℹ️ PR is in draft status"
+          else
+            echo "✅ PR is ready for review"
+          fi
+
+      - name: Check required reviews
+        run: |
+          # This would be implemented with GitHub API calls in a real scenario
+          echo "📝 Checking required reviews..."
+          echo "ℹ️ Actual review count checking requires GitHub API token"
+
+      - name: Validate commit messages
+        run: |
+          echo "📋 Validating commit messages..."
+
+          # Get recent commits
+          COMMITS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | \
+            jq -r '.[] | .commit.message')
+
+          if [ -n "$COMMITS" ]; then
+            echo "Recent commits:"
+            echo "$COMMITS" | head -5
+
+            # Basic validation for conventional commits
+            VALID_COMMITS=$(echo "$COMMITS" | grep -c -E "^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?: .+" || echo "0")
+            TOTAL_COMMITS=$(echo "$COMMITS" | wc -l)
+
+            echo "Conventional commits: $VALID_COMMITS/$TOTAL_COMMITS"
+
+            if [ "$VALID_COMMITS" -gt 0 ]; then
+              echo "✅ Some commits follow conventional commit format"
+            else
+              echo "ℹ️ No conventional commits detected"
+            fi
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

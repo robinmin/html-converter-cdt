@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Converter CDT - Accessible Web Interface</title>
+    <meta name="description" content="Convert HTML documents to various formats including PDF, MHTML, PNG, and more with full accessibility support">
+    <link rel="stylesheet" href="./styles/accessibility.css">
+    <script type="module" src="./scripts/converter.js"></script>
+    <style>
+        :root {
+            --focus-color: #005fcc;
+            --focus-width: 3px;
+            --focus-offset: 2px;
+        }
+
+        button {
+            min-width: 44px !important;
+            min-height: 44px !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to main content link for keyboard navigation -->
+    <a href="#main-content" class="skip-link" aria-label="Skip to main content">Skip to main content</a>
+
+    <!-- Header with navigation -->
+    <header role="banner" aria-label="Site header">
+        <nav role="navigation" aria-label="Main navigation">
+            <h1 class="app-title">HTML Converter CDT</h1>
+            <ul class="nav-links" role="menubar">
+                <li role="none"><a href="#converter" role="menuitem" aria-current="page" aria-describedby="converter-desc">Converter</a></li>
+                <li role="none"><a href="#settings" role="menuitem" aria-describedby="settings-desc">Settings</a></li>
+                <li role="none"><a href="#help" role="menuitem" aria-describedby="help-desc">Help</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hidden description elements for screen readers -->
+    <div class="sr-only" id="converter-desc">Convert HTML documents to various formats</div>
+    <div class="sr-only" id="settings-desc">Configure conversion settings and preferences</div>
+    <div class="sr-only" id="help-desc">Get help and keyboard shortcuts</div>
+
+    <!-- Main content area -->
+    <main id="main-content" role="main" aria-label="Main converter interface">
+        <!-- Page title and description -->
+        <section aria-labelledby="page-title" class="page-header">
+            <h1 id="page-title">HTML Document Converter</h1>
+            <p class="page-description">
+                Convert HTML documents to various formats including PDF, MHTML, PNG, JPEG, Markdown, and DOCX with full accessibility support.
+            </p>
+        </section>
+
+        <!-- Input section -->
+        <section aria-labelledby="input-section-title" class="input-section">
+            <h2 id="input-section-title">1. Enter HTML Content or URL</h2>
+
+            <!-- Input method selection -->
+            <div class="input-method-selector" role="radiogroup" aria-labelledby="input-method-label">
+                <h3 id="input-method-label">Select input method:</h3>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" id="url-input" name="input-method" value="url" checked>
+                        <span>URL</span>
+                    </label>
+                    <label>
+                        <input type="radio" id="html-input" name="input-method" value="html">
+                        <span>HTML Content</span>
+                    </label>
+                    <label>
+                        <input type="radio" id="file-input" name="input-method" value="file">
+                        <span>Upload File</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- URL input -->
+            <div id="url-input-group" class="input-group" role="group" aria-labelledby="url-input-label">
+                <label for="url-field" id="url-input-label">Enter webpage URL:</label>
+                <input
+                    type="url"
+                    id="url-field"
+                    name="url-field"
+                    placeholder="https://example.com"
+                    aria-describedby="url-help url-error"
+                    aria-required="true"
+                    autocomplete="url"
+                    spellcheck="false"
+                >
+                <div id="url-help" class="help-text">
+                    Enter the full URL of the webpage you want to convert
+                </div>
+                <div id="url-error" class="error-message" role="alert" aria-live="polite"></div>
+            </div>
+
+            <!-- HTML content input -->
+            <div id="html-input-group" class="input-group hidden" role="group" aria-labelledby="html-input-label">
+                <label for="html-field" id="html-input-label">Enter HTML content:</label>
+                <textarea
+                    id="html-field"
+                    name="html-field"
+                    placeholder="Enter your HTML content here..."
+                    aria-describedby="html-help html-error"
+                    aria-required="true"
+                    rows="10"
+                    spellcheck="false"
+                ></textarea>
+                <div id="html-help" class="help-text">
+                    Paste your HTML content directly into this text area
+                </div>
+                <div id="html-error" class="error-message" role="alert" aria-live="polite"></div>
+            </div>
+
+            <!-- File upload -->
+            <div id="file-input-group" class="input-group hidden" role="group" aria-labelledby="file-input-label">
+                <label for="file-field" id="file-input-label">Upload HTML file:</label>
+                <input
+                    type="file"
+                    id="file-field"
+                    name="file-field"
+                    accept=".html,.htm"
+                    aria-describedby="file-help file-error"
+                    aria-required="true"
+                >
+                <div id="file-help" class="help-text">
+                    Select an HTML file from your computer
+                </div>
+                <div id="file-error" class="error-message" role="alert" aria-live="polite"></div>
+            </div>
+        </section>
+
+        <!-- Format selection section -->
+        <section aria-labelledby="format-section-title" class="format-section">
+            <h2 id="format-section-title">2. Select Output Format</h2>
+
+            <div class="format-grid" role="radiogroup" aria-labelledby="format-selection-label">
+                <h3 id="format-selection-label">Choose output format:</h3>
+
+                <label for="format-pdf" class="format-option">
+                    <input type="radio" id="format-pdf" name="output-format" value="pdf" checked>
+                    <div class="format-card">
+                        <span class="format-name">PDF</span>
+                        <span class="format-description">Portable Document Format</span>
+                    </div>
+                </label>
+
+                <label for="format-mhtml" class="format-option">
+                    <input type="radio" id="format-mhtml" name="output-format" value="mhtml">
+                    <div class="format-card">
+                        <span class="format-name">MHTML</span>
+                        <span class="format-description">MIME HTML Archive</span>
+                    </div>
+                </label>
+
+                <label for="format-png" class="format-option">
+                    <input type="radio" id="format-png" name="output-format" value="png">
+                    <div class="format-card">
+                        <span class="format-name">PNG</span>
+                        <span class="format-description">PNG Image</span>
+                    </div>
+                </label>
+
+                <label for="format-jpeg" class="format-option">
+                    <input type="radio" id="format-jpeg" name="output-format" value="jpeg">
+                    <div class="format-card">
+                        <span class="format-name">JPEG</span>
+                        <span class="format-description">JPEG Image</span>
+                    </div>
+                </label>
+
+                <label for="format-markdown" class="format-option">
+                    <input type="radio" id="format-markdown" name="output-format" value="markdown">
+                    <div class="format-card">
+                        <span class="format-name">Markdown</span>
+                        <span class="format-description">Markdown Text</span>
+                    </div>
+                </label>
+
+                <label for="format-docx" class="format-option">
+                    <input type="radio" id="format-docx" name="output-format" value="docx">
+                    <div class="format-card">
+                        <span class="format-name">DOCX</span>
+                        <span class="format-description">Word Document</span>
+                    </div>
+                </label>
+            </div>
+        </section>
+
+        <!-- Options section -->
+        <section aria-labelledby="options-section-title" class="options-section">
+            <h2 id="options-section-title">3. Conversion Options</h2>
+
+            <div class="options-grid">
+                <!-- File name option -->
+                <div class="option-group">
+                    <label for="filename-input" id="filename-label">Output filename (optional):</label>
+                    <input
+                        type="text"
+                        id="filename-input"
+                        name="filename-input"
+                        placeholder="converted-document"
+                        aria-describedby="filename-help"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <div id="filename-help" class="help-text">
+                        Specify a custom filename (without extension)
+                    </div>
+                </div>
+
+                <!-- Paper size (PDF only) -->
+                <div id="pdf-options" class="option-group">
+                    <label for="paper-size" id="paper-size-label">Paper size:</label>
+                    <select id="paper-size" name="paper-size" aria-describedby="paper-size-help">
+                        <option value="A4" selected>A4</option>
+                        <option value="A3">A3</option>
+                        <option value="A5">A5</option>
+                        <option value="Letter">Letter</option>
+                        <option value="Legal">Legal</option>
+                    </select>
+                    <div id="paper-size-help" class="help-text">
+                        Select paper size for PDF output
+                    </div>
+                </div>
+
+                <!-- Quality option (images only) -->
+                <div id="image-options" class="option-group hidden">
+                    <label for="image-quality" id="image-quality-label">Image quality:</label>
+                    <input
+                        type="range"
+                        id="image-quality"
+                        name="image-quality"
+                        min="10"
+                        max="100"
+                        value="80"
+                        aria-describedby="image-quality-help image-quality-value"
+                    >
+                    <div id="image-quality-help" class="help-text">
+                        Adjust image quality (10-100)
+                    </div>
+                    <div id="image-quality-value" class="value-display" aria-live="polite">80%</div>
+                </div>
+
+                <!-- Include background graphics -->
+                <div class="option-group">
+                    <label for="include-background" class="checkbox-label">
+                        <input
+                            type="checkbox"
+                            id="include-background"
+                            name="include-background"
+                            checked
+                            aria-describedby="background-help"
+                        >
+                        <span>Include background graphics</span>
+                    </label>
+                    <div id="background-help" class="help-text">
+                        Include background images and colors in the conversion
+                    </div>
+                </div>
+
+                <!-- Include metadata -->
+                <div class="option-group">
+                    <label for="include-metadata" class="checkbox-label">
+                        <input
+                            type="checkbox"
+                            id="include-metadata"
+                            name="include-metadata"
+                            checked
+                            aria-describedby="metadata-help"
+                        >
+                        <span>Include metadata</span>
+                    </label>
+                    <div id="metadata-help" class="help-text">
+                        Include document metadata in the output
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conversion section -->
+        <section aria-labelledby="conversion-section-title" class="conversion-section">
+            <h2 id="conversion-section-title">4. Convert Document</h2>
+
+            <div class="conversion-controls">
+                <button
+                    id="convert-button"
+                    type="button"
+                    aria-describedby="convert-help"
+                    aria-busy="false"
+                >
+                    <span class="button-text">Convert Document</span>
+                    <span class="button-spinner hidden" aria-hidden="true"></span>
+                </button>
+
+                <div id="convert-help" class="help-text">
+                    Press Enter or Space to start conversion, or use Ctrl+Enter for quick conversion
+                </div>
+
+                <!-- Cancel button (shown during conversion) -->
+                <button
+                    id="cancel-button"
+                    type="button"
+                    class="hidden"
+                    aria-label="Cancel conversion"
+                >
+                    Cancel Conversion
+                </button>
+            </div>
+
+            <!-- Progress indicator -->
+            <div id="progress-container" class="progress-container hidden" role="status" aria-live="polite">
+                <h3 id="progress-title" class="progress-title">Conversion in Progress</h3>
+
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar" role="progressbar" aria-labelledby="progress-title" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                </div>
+
+                <div class="progress-details">
+                    <span id="progress-percentage" aria-live="polite">0%</span>
+                    <span id="progress-message" aria-live="polite">Starting conversion...</span>
+                </div>
+
+                <!-- Current step information -->
+                <div class="step-information">
+                    <span id="current-step" aria-live="polite">Step 1 of 4: Initializing</span>
+                </div>
+            </div>
+
+            <!-- Results section -->
+            <div id="results-container" class="results-container hidden" role="region" aria-labelledby="results-title">
+                <h3 id="results-title">Conversion Results</h3>
+
+                <div id="success-result" class="result success-result hidden" role="alert" aria-live="polite">
+                    <h4>Conversion Successful!</h4>
+                    <p id="result-message">Your document has been converted successfully.</p>
+
+                    <div class="result-actions">
+                        <button id="download-button" type="button" aria-describedby="download-help">
+                            Download Document
+                        </button>
+                        <div id="download-help" class="help-text">
+                            Press Enter or Space to download your converted document
+                        </div>
+
+                        <button id="convert-another-button" type="button">
+                            Convert Another Document
+                        </button>
+                    </div>
+
+                    <!-- Result metadata -->
+                    <div class="result-metadata">
+                        <h5>Document Information</h5>
+                        <dl>
+                            <dt>Format:</dt>
+                            <dd id="result-format">-</dd>
+                            <dt>File size:</dt>
+                            <dd id="result-size">-</dd>
+                            <dt>Conversion time:</dt>
+                            <dd id="result-time">-</dd>
+                            <dt>Conversion method:</dt>
+                            <dd id="result-method">-</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div id="error-result" class="result error-result hidden" role="alert" aria-live="assertive">
+                    <h4>Conversion Failed</h4>
+                    <p id="error-message">An error occurred during conversion.</p>
+
+                    <div class="error-details">
+                        <h5>Error Details</h5>
+                        <p id="error-description"></p>
+                        <div id="recovery-suggestions">
+                            <h6>Suggested Solutions:</h6>
+                            <ul id="recovery-list"></ul>
+                        </div>
+                    </div>
+
+                    <div class="error-actions">
+                        <button id="retry-button" type="button">
+                            Try Again
+                        </button>
+                        <button id="report-issue-button" type="button">
+                            Report Issue
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Settings dialog -->
+    <div id="settings-dialog" class="dialog-overlay hidden" role="dialog" aria-labelledby="settings-title" aria-modal="true">
+        <div class="dialog-content">
+            <div class="dialog-header">
+                <h2 id="settings-title">Conversion Settings</h2>
+                <button id="settings-close-button" type="button" aria-label="Close settings dialog">×</button>
+            </div>
+
+            <div class="dialog-body">
+                <!-- Theme settings -->
+                <div class="settings-section">
+                    <h3>Appearance</h3>
+                    <div class="setting-group">
+                        <label for="theme-select">Theme:</label>
+                        <select id="theme-select" aria-describedby="theme-help">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="high-contrast">High Contrast</option>
+                            <option value="system">System Preference</option>
+                        </select>
+                        <div id="theme-help" class="help-text">
+                            Choose your preferred color theme
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label for="font-size-select">Font size:</label>
+                        <select id="font-size-select" aria-describedby="font-size-help">
+                            <option value="small">Small</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="large">Large</option>
+                            <option value="extra-large">Extra Large</option>
+                        </select>
+                        <div id="font-size-help" class="help-text">
+                            Adjust text size for better readability
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced settings -->
+                <div class="settings-section">
+                    <h3>Advanced Options</h3>
+                    <div class="setting-group">
+                        <label for="timeout-input" class="number-label">
+                            Conversion timeout (seconds):
+                            <input
+                                type="number"
+                                id="timeout-input"
+                                min="5"
+                                max="300"
+                                value="30"
+                                aria-describedby="timeout-help"
+                            >
+                        </label>
+                        <div id="timeout-help" class="help-text">
+                            Maximum time to wait for conversion to complete
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialog-footer">
+                <button id="settings-save-button" type="button">Save Settings</button>
+                <button id="settings-cancel-button" type="button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help section -->
+    <section id="help" aria-labelledby="help-title" class="help-section">
+        <h2 id="help-title">Help & Support</h2>
+
+        <div class="help-content">
+            <h3>Keyboard Shortcuts</h3>
+            <dl class="keyboard-shortcuts">
+                <dt><kbd>Ctrl</kbd> + <kbd>Enter</kbd></dt>
+                <dd>Start conversion</dd>
+
+                <dt><kbd>Ctrl</kbd> + <kbd>D</kbd></dt>
+                <dd>Download converted document (when available)</dd>
+
+                <dt><kbd>Escape</kbd></dt>
+                <dd>Cancel conversion or close dialog</dd>
+
+                <dt><kbd>Tab</kbd></dt>
+                <dd>Navigate between interactive elements</dd>
+
+                <dt><kbd>Alt</kbd> + <kbd>S</kbd></dt>
+                <dd>Open settings dialog</dd>
+
+                <dt><kbd>Alt</kbd> + <kbd>H</kbd></dt>
+                <dd>Jump to help section</dd>
+            </dl>
+
+            <h3>Accessibility Features</h3>
+            <ul>
+                <li>Full keyboard navigation support</li>
+                <li>Screen reader compatibility</li>
+                <li>High contrast mode support</li>
+                <li>Adjustable font sizes</li>
+                <li>ARIA labels and landmarks for better navigation</li>
+                <li>Live regions for progress updates</li>
+            </ul>
+
+            <h3>Supported Formats</h3>
+            <ul>
+                <li><strong>PDF:</strong> Portable Document Format with custom paper sizes</li>
+                <li><strong>MHTML:</strong> MIME HTML archive with embedded resources</li>
+                <li><strong>PNG/JPEG:</strong> Image formats with adjustable quality</li>
+                <li><strong>Markdown:</strong> Plain text markdown format</li>
+                <li><strong>DOCX:</strong> Microsoft Word document format</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer role="contentinfo" aria-label="Site footer">
+        <p>&copy; 2024 HTML Converter CDT. Built with accessibility in mind.</p>
+        <p>For support and accessibility feedback, please visit our help section.</p>
+    </footer>
+
+    <!-- ARIA live regions for dynamic content announcements -->
+    <div class="sr-only" aria-live="polite" aria-atomic="true">
+        <div id="conversion-announcement"></div>
+        <div id="error-announcement"></div>
+        <div id="status-announcement"></div>
+    </div>
+</body>
+</html>

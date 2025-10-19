@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Large Document for Performance Testing</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+
+        .chapter {
+            background: white;
+            margin: 30px 0;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+
+        h1 {
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        .author-info {
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d;
+            margin: 20px 0;
+        }
+
+        .quote {
+            background: #ecf0f1;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .table th, .table td {
+            border: 1px solid #bdc3c7;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .table th {
+            background: #34495e;
+            color: white;
+        }
+
+        .table tr:nth-child(even) {
+            background: #ecf0f1;
+        }
+
+        .footnote {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 10px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>A Comprehensive Guide to Web Development</h1>
+        <div class="author-info">By Anonymous Author</div>
+        <div class="author-info">Published: January 2024 | Pages: 50+ | Reading Time: ~2 hours</div>
+    </header>
+
+    <div class="chapter">
+        <h2>Chapter 1: Introduction to HTML</h2>
+        <p>HTML (HyperText Markup Language) is the foundation of web development. It provides the structure and content of web pages through a system of tags and elements.</p>
+
+        <h3>1.1 What is HTML?</h3>
+        <p>HTML is a markup language that defines the structure and content of web pages. It uses tags to define different types of content such as headings, paragraphs, lists, links, and more.</p>
+
+        <div class="quote">
+            "HTML is the skeleton of the web. Without it, there would be no structure to hold the content together."
+        </div>
+
+        <h3>1.2 Basic HTML Structure</h3>
+        <p>Every HTML document follows a basic structure with essential elements:</p>
+
+        <div class="code-block">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Document Title&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Main Heading&lt;/h1&gt;
+    &lt;p&gt;Content goes here&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+        </div>
+
+        <h3>1.3 Common HTML Elements</h3>
+        <p>HTML provides a wide variety of elements for different types of content:</p>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Element</th>
+                    <th>Purpose</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>&lt;h1&gt;-&lt;h6&gt;</td>
+                    <td>Headings</td>
+                    <td>&lt;h1&gt;Main Title&lt;/h1&gt;</td>
+                </tr>
+                <tr>
+                    <td>&lt;p&gt;</td>
+                    <td>Paragraphs</td>
+                    <td>&lt;p&gt;Text content&lt;/p&gt;</td>
+                </tr>
+                <tr>
+                    <td>&lt;a&gt;</td>
+                    <td>Links</td>
+                    <td>&lt;a href="#"&gt;Link text&lt;/a&gt;</td>
+                </tr>
+                <tr>
+                    <td>&lt;img&gt;</td>
+                    <td>Images</td>
+                    <td>&lt;img src="image.jpg" alt="Description"&gt;</td>
+                </tr>
+                <tr>
+                    <td>&lt;div&gt;</td>
+                    <td>Container</td>
+                    <td>&lt;div&gt;Content block&lt;/div&gt;</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="chapter">
+        <h2>Chapter 2: CSS Styling</h2>
+        <p>CSS (Cascading Style Sheets) is used to style and layout HTML elements. It controls colors, fonts, spacing, positioning, and responsive design.</p>
+
+        <h3>2.1 CSS Basics</h3>
+        <p>CSS works by selecting HTML elements and applying style rules to them. The basic syntax consists of a selector and a declaration block:</p>
+
+        <div class="code-block">
+selector {
+    property: value;
+    another-property: another-value;
+}
+        </div>
+
+        <h3>2.2 CSS Selectors</h3>
+        <p>CSS provides various ways to select elements:</p>
+
+        <ul>
+            <li><strong>Element selectors:</strong> Target elements by their tag name (e.g., p, h1, div)</li>
+            <li><strong>Class selectors:</strong> Target elements by their class attribute (e.g., .classname)</li>
+            <li><strong>ID selectors:</strong> Target elements by their ID attribute (e.g., #idname)</li>
+            <li><strong>Attribute selectors:</strong> Target elements by their attributes (e.g., [type="text"])</li>
+            <li><strong>Pseudo-classes:</strong> Target elements based on their state (e.g., :hover, :active)</li>
+        </ul>
+
+        <h3>2.3 The Box Model</h3>
+        <p>Every HTML element is essentially a rectangular box. The CSS box model describes how these boxes are structured:</p>
+
+        <ol>
+            <li><strong>Content:</strong> The actual content of the element</li>
+            <li><strong>Padding:</strong> Space between the content and the border</li>
+            <li><strong>Border:</strong> A line that surrounds the padding</li>
+            <li><strong>Margin:</strong> Space outside the border</li>
+        </ol>
+
+        <div class="quote">
+            "Understanding the box model is fundamental to mastering CSS layout and spacing."
+        </div>
+    </div>
+
+    <div class="chapter">
+        <h2>Chapter 3: JavaScript Programming</h2>
+        <p>JavaScript is the programming language of the web. It adds interactivity, dynamic behavior, and complex functionality to web pages.</p>
+
+        <h3>3.1 What is JavaScript?</h3>
+        <p>JavaScript is a high-level, interpreted programming language that enables interactive web pages. It is an essential part of web applications, alongside HTML and CSS.</p>
+
+        <h3>3.2 Variables and Data Types</h3>
+        <p>JavaScript variables can hold different types of data:</p>
+
+        <div class="code-block">
+// Numbers
+let age = 25;
+let price = 99.99;
+
+// Strings
+let name = "John Doe";
+let message = 'Hello, World!';
+
+// Booleans
+let isLoggedIn = true;
+let hasPermission = false;
+
+// Arrays
+let fruits = ["apple", "banana", "orange"];
+let numbers = [1, 2, 3, 4, 5];
+
+// Objects
+let person = {
+    firstName: "John",
+    lastName: "Doe",
+    age: 30
+};
+        </div>
+
+        <h3>3.3 Functions</h3>
+        <p>Functions are reusable blocks of code that perform specific tasks:</p>
+
+        <div class="code-block">
+// Function declaration
+function greet(name) {
+    return "Hello, " + name + "!";
+}
+
+// Function expression
+const add = function(a, b) {
+    return a + b;
+};
+
+// Arrow function
+const multiply = (a, b) => a * b;
+        </div>
+
+        <h3>3.4 DOM Manipulation</h3>
+        <p>JavaScript can interact with and modify HTML elements through the Document Object Model (DOM):</p>
+
+        <div class="code-block">
+// Select elements
+const element = document.getElementById('myElement');
+const elements = document.querySelectorAll('.myClass');
+
+// Modify content
+element.textContent = 'New content';
+element.innerHTML = '&lt;strong&gt;Bold content&lt;/strong&gt;';
+
+// Modify styles
+element.style.color = 'red';
+element.style.fontSize = '18px';
+
+// Add event listeners
+element.addEventListener('click', function() {
+    alert('Element clicked!');
+});
+        </div>
+    </div>
+
+    <div class="chapter">
+        <h2>Chapter 4: Responsive Design</h2>
+        <p>Responsive design ensures that web pages look and function well on all devices and screen sizes, from mobile phones to desktop computers.</p>
+
+        <h3>4.1 Viewport Meta Tag</h3>
+        <p>The viewport meta tag is essential for responsive design:</p>
+
+        <div class="code-block">
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+        </div>
+
+        <h3>4.2 Media Queries</h3>
+        <p>Media queries allow CSS to apply different styles based on device characteristics:</p>
+
+        <div class="code-block">
+/* Mobile devices */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .nav {
+        display: none;
+    }
+}
+
+/* Tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        padding: 20px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+        </div>
+
+        <h3>4.3 Flexible Layouts</h3>
+        <p>Modern CSS provides multiple approaches for creating flexible layouts:</p>
+
+        <ul>
+            <li><strong>Flexbox:</strong> One-dimensional layout system for arranging items in rows or columns</li>
+            <li><strong>Grid:</strong> Two-dimensional layout system for creating complex grid-based layouts</li>
+            <li><strong>CSS Units:</strong> Relative units like %, em, rem, vh, vw for scalable designs</li>
+        </ul>
+    </div>
+
+    <div class="chapter">
+        <h2>Chapter 5: Web Performance</h2>
+        <p>Web performance is crucial for user experience and search engine rankings. Fast-loading websites retain users better and rank higher in search results.</p>
+
+        <h3>5.1 Optimization Techniques</h3>
+        <p>Several techniques can improve web performance:</p>
+
+        <ol>
+            <li><strong>Minimize HTTP requests:</strong> Combine files and use CSS sprites</li>
+            <li><strong>Optimize images:</strong> Use appropriate formats and compress images</li>
+            <li><strong>Minify code:</strong> Remove unnecessary characters from HTML, CSS, and JavaScript</li>
+            <li><strong>Enable caching:</strong> Use browser caching to reduce server requests</li>
+            <li><strong>Use CDNs:</strong> Content Delivery Networks distribute content globally</li>
+        </ol>
+
+        <h3>5.2 Performance Metrics</h3>
+        <p>Key performance metrics to monitor:</p>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Description</th>
+                    <th>Good Target</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>First Contentful Paint (FCP)</td>
+                    <td>Time to first visual content</td>
+                    <td>&lt; 1.8 seconds</td>
+                </tr>
+                <tr>
+                    <td>Largest Contentful Paint (LCP)</td>
+                    <td>Time to largest visual element</td>
+                    <td>&lt; 2.5 seconds</td>
+                </tr>
+                <tr>
+                    <td>First Input Delay (FID)</td>
+                    <td>Time to first interaction</td>
+                    <td>&lt; 100 milliseconds</td>
+                </tr>
+                <tr>
+                    <td>Cumulative Layout Shift (CLS)</td>
+                    <td>Visual stability score</td>
+                    <td>&lt; 0.1</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="chapter">
+        <h2>Chapter 6: Best Practices</h2>
+        <p>Following web development best practices ensures maintainable, accessible, and secure websites.</p>
+
+        <h3>6.1 Code Organization</h3>
+        <p>Organize code logically and consistently:</p>
+
+        <ul>
+            <li>Use semantic HTML5 elements appropriately</li>
+            <li>Separate concerns (HTML for structure, CSS for styling, JS for behavior)</li>
+            <li>Follow naming conventions consistently</li>
+            <li>Comment code where necessary</li>
+            <li>Use version control systems like Git</li>
+        </ul>
+
+        <h3>6.2 Accessibility</h3>
+        <p>Make websites accessible to all users:</p>
+
+        <ul>
+            <li>Use semantic HTML elements</li>
+            <li>Provide alternative text for images</li>
+            <li>Ensure keyboard navigation support</li>
+            <li>Maintain good color contrast</li>
+            <li>Use ARIA attributes where needed</li>
+        </ul>
+
+        <h3>6.3 Security</h3>
+        <p>Protect websites and user data:</p>
+
+        <ul>
+            <li>Validate and sanitize user input</li>
+            <li>Use HTTPS for all communications</li>
+            <li>Keep dependencies updated</li>
+            <li>Implement Content Security Policy (CSP)</li>
+            <li>Avoid eval() and similar dangerous functions</li>
+        </ul>
+    </div>
+
+    <div class="chapter">
+        <h2>Chapter 7: Modern Tools and Frameworks</h2>
+        <p>Modern web development involves various tools and frameworks that streamline the development process.</p>
+
+        <h3>7.1 Package Managers</h3>
+        <p>Package managers help manage project dependencies:</p>
+
+        <ul>
+            <li><strong>npm:</strong> Node Package Manager, the largest JavaScript package registry</li>
+            <li><strong>Yarn:</strong> Fast, reliable, and secure dependency management</li>
+            <li><strong>pnpm:</strong> Fast, disk space efficient package manager</li>
+        </ul>
+
+        <h3>7.2 Build Tools</h3>
+        <p>Build tools optimize and bundle code for production:</p>
+
+        <ul>
+            <li><strong>Webpack:</strong> Module bundler for JavaScript applications</li>
+            <li><strong>Vite:</strong> Fast build tool and development server</li>
+            <li><strong>Rollup:</strong> Module bundler for libraries</li>
+            <li><strong>Parcel:</strong> Zero configuration build tool</li>
+        </ul>
+
+        <h3>7.3 Frontend Frameworks</h3>
+        <p>Popular frontend frameworks and libraries:</p>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Framework</th>
+                    <th>Type</th>
+                    <th>Key Features</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>React</td>
+                    <td>Library</td>
+                    <td>Virtual DOM, Component-based</td>
+                </tr>
+                <tr>
+                    <td>Vue.js</td>
+                    <td>Framework</td>
+                    <td>Progressive, Easy to learn</td>
+                </tr>
+                <tr>
+                    <td>Angular</td>
+                    <td>Framework</td>
+                    <td>Full-featured, TypeScript-based</td>
+                </tr>
+                <tr>
+                    <td>Svelte</td>
+                    <td>Compiler</td>
+                    <td>No virtual DOM, Compile-time</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <div class="footnote">
+            <p><strong>About this document:</strong> This is a comprehensive guide covering various aspects of web development, designed to test the performance and capabilities of HTML-to-document conversion tools.</p>
+            <p><strong>Document statistics:</strong> ~7,000 words, 50+ pages, multiple chapters, tables, code examples, and various HTML elements.</p>
+            <p><strong>Last updated:</strong> January 2024</p>
+        </div>
+    </footer>
+</body>
+</html>

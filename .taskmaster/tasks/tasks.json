@@ -1,0 +1,1040 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Phase 1.1: Project Setup & Configuration",
+        "description": "Initialize project structure with TypeScript, ESM, and Vite. Configure dual-environment build system (browser/Node.js) with comprehensive development tooling.",
+        "details": "Set up a modern TypeScript project structure with ESM support and Vite as the build tool. Configure dual-environment builds for both browser and Node.js environments. Install and configure Jest for unit testing, Playwright for E2E testing, ESLint with TypeScript and Prettier integrations, and enable TypeScript strict mode. Set up GitHub Actions CI/CD pipeline with automated testing and deployment workflows. Configure webpack-bundle-analyzer for bundle size optimization and monitoring. Initialize project with proper package.json scripts, tsconfig.json with strict mode, vite.config.ts for dual builds, .eslintrc.js with TypeScript rules, .prettierrc for consistent formatting, Jest configuration for testing, and Playwright setup for E2E testing. Configure GitHub Actions workflows for automated testing on multiple Node.js versions and browser environments.",
+        "testStrategy": "Verify project builds successfully in both browser and Node.js environments. Run Jest unit tests to confirm testing framework is properly configured. Execute Playwright tests to validate E2E testing setup. Check ESLint runs without errors and enforces code quality. Verify Prettier formatting works correctly. Confirm GitHub Actions workflow runs successfully on multiple environments. Validate bundle analysis tools generate proper reports. Test that TypeScript strict mode catches type errors appropriately.",
+        "status": "done",
+        "dependencies": [],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize Project Structure with TypeScript and Vite",
+            "description": "Set up basic project structure with TypeScript configuration, package.json, and Vite build tool for dual-environment support.",
+            "dependencies": [],
+            "details": "Initialize npm project with TypeScript configuration including strict mode, ESM support, and dual environment targeting (browser/Node.js). Set up Vite as build tool with appropriate configuration files for both environments.",
+            "status": "done",
+            "testStrategy": "Verify TypeScript compilation works correctly and Vite can build for both browser and Node.js environments.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Configure Development Tooling (ESLint, Prettier, Jest)",
+            "description": "Install and configure code quality tools including ESLint with TypeScript rules, Prettier for formatting, and Jest for unit testing.",
+            "dependencies": [
+              1
+            ],
+            "details": "Set up ESLint with TypeScript plugin and appropriate rules for code quality. Configure Prettier for consistent code formatting. Install and configure Jest with TypeScript support for unit testing framework.",
+            "status": "done",
+            "testStrategy": "Run ESLint to ensure no configuration errors, test Prettier formatting, and verify Jest can run TypeScript tests successfully.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-15T00:52:39.868Z"
+          },
+          {
+            "id": 3,
+            "title": "Set Up Playwright for E2E Testing",
+            "description": "Configure Playwright for end-to-end testing with multiple browser environments and integrate with the testing workflow.",
+            "dependencies": [
+              2
+            ],
+            "details": "Install Playwright and configure it for E2E testing across different browsers. Set up test configuration files, browser selection, and integrate with existing Jest testing setup.",
+            "status": "done",
+            "testStrategy": "Run Playwright installation and execute basic E2E tests to verify browser automation works correctly.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-15T00:52:44.102Z"
+          },
+          {
+            "id": 4,
+            "title": "Configure GitHub Actions CI/CD Pipeline",
+            "description": "Set up automated testing and deployment workflows using GitHub Actions with multi-environment support.",
+            "dependencies": [
+              3
+            ],
+            "details": "Create GitHub Actions workflow files for automated testing across multiple Node.js versions and browser environments. Configure build, test, and deployment stages with proper artifact handling.",
+            "status": "done",
+            "testStrategy": "Trigger GitHub Actions workflow and verify all tests pass across different environments.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Configure Bundle Analysis and Optimization Tools",
+            "description": "Set up webpack-bundle-analyzer and configure optimization settings for monitoring and reducing bundle sizes.",
+            "dependencies": [
+              4
+            ],
+            "details": "Install and configure webpack-bundle-analyzer for bundle size monitoring. Set up Vite optimization settings for production builds. Create scripts for bundle analysis and size reporting.",
+            "status": "done",
+            "testStrategy": "Run bundle analysis on production builds and verify optimization settings are working correctly.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-15T00:52:48.579Z"
+          }
+        ],
+        "updatedAt": "2025-10-15T00:52:48.579Z"
+      },
+      {
+        "id": "2",
+        "title": "Phase 1.2: Core Architecture Implementation",
+        "description": "Implement Strategy pattern for converter selection, Factory pattern for converter instantiation, CDP abstraction layer, environment detection, base converter interface, and dependency injection container.",
+        "details": "Design and implement a robust architecture using proven design patterns. Start with creating the Strategy pattern for converter selection: `interface ConverterStrategy { convert(html: string): Promise<string>; canHandle(contentType: string): boolean; }`. Implement the Factory pattern for converter instantiation with `class ConverterFactory { createConverter(type: string): ConverterStrategy }`. Build a comprehensive CDP abstraction layer: `class CDPClient { async connect(): Promise<void>; async evaluate(expression: string): Promise<any>; async close(): Promise<void>; }`. Implement environment detection utility: `const isBrowser = typeof window !== 'undefined'; const isNode = typeof process !== 'undefined' && process.versions?.node;`. Create base converter interface: `interface IConverter { convert(input: HTMLDocument): Promise<ConversionResult>; validate(input: HTMLDocument): ValidationResult; }` with abstract classes: `abstract class BaseConverter implements IConverter { protected logger: Logger; constructor(logger: Logger) { this.logger = logger; } abstract convert(input: HTMLDocument): Promise<ConversionResult>; }`. Set up dependency injection container using a lightweight IoC library like `inversify` or custom implementation: `class DIContainer { register<T>(token: string, implementation: new (...args: any[]) => T): void; resolve<T>(token: string): T; }`. Organize architecture in `src/architecture/` with clear separation of concerns: strategies/, factories/, adapters/, and di/ subdirectories.",
+        "testStrategy": "Create comprehensive unit tests for each pattern implementation using Jest. Test Strategy pattern with different converter implementations and validate correct selection logic. Verify Factory pattern creates appropriate converter instances based on input parameters. Test CDP abstraction layer with mock Chrome DevTools Protocol connections and commands. Validate environment detection works correctly in both browser and Node.js contexts using environment-specific test suites. Test dependency injection container resolves dependencies correctly and handles circular dependencies. Create integration tests to verify all patterns work together seamlessly. Use TypeScript's strict type checking to ensure interface compliance and catch architectural issues at compile time.",
+        "status": "done",
+        "dependencies": [
+          "1"
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Strategy Pattern for Converter Selection",
+            "description": "Create the core Strategy pattern interfaces and base classes for converter selection with type-safe implementations",
+            "dependencies": [],
+            "details": "Implement ConverterStrategy interface with convert(html: string): Promise<string> and canHandle(contentType: string): boolean methods. Create abstract BaseConverter class implementing IConverter interface with protected logger property and abstract methods. Define ConversionResult and ValidationResult types. Create strategy registry for managing available converters. Implement in src/architecture/strategies/ directory following existing TypeScript patterns.",
+            "status": "done",
+            "testStrategy": "Unit tests using Vitest to verify strategy interface compliance, canHandle logic for different content types, and proper error handling for invalid inputs",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Factory Pattern for Converter Instantiation",
+            "description": "Create ConverterFactory class for dynamic converter instantiation with type safety and error handling",
+            "dependencies": [
+              1
+            ],
+            "details": "Build ConverterFactory class with createConverter(type: string): ConverterStrategy method. Implement converter registration system allowing dynamic addition of new converter types. Add validation for unknown converter types with descriptive error messages. Create factory configuration options for default converters. Organize in src/architecture/factories/ directory with proper TypeScript generics support.",
+            "status": "done",
+            "testStrategy": "Test factory creation of different converter types, validation of unknown types, and proper dependency injection of logger instances into created converters",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build CDP Abstraction Layer",
+            "description": "Create comprehensive Chrome DevTools Protocol abstraction layer with connection management and error handling",
+            "dependencies": [],
+            "details": "Implement CDPClient class with async connect(), evaluate(expression: string), and close() methods. Add connection pooling, automatic reconnection logic, and timeout handling. Create CDP event handling system for page lifecycle events. Implement proper resource cleanup and error recovery mechanisms. Add support for multiple CDP targets and session management. Place in src/architecture/adapters/cdp/ directory.",
+            "status": "done",
+            "testStrategy": "Mock CDP connections to test connection lifecycle, error handling scenarios, evaluation of JavaScript expressions, and proper cleanup of resources",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Environment Detection Utility",
+            "description": "Create robust environment detection system for browser, Node.js, and feature capability detection",
+            "dependencies": [],
+            "details": "Build environment detection utility with isBrowser, isNode, and feature detection capabilities. Implement capability detection for CDP availability, canvas support, Web Workers, and network access. Create EnvironmentDetector class with methods for detecting specific browser features and versions. Add support for detecting headless browser environments and server-side rendering contexts. Organize in src/architecture/environment/ directory.",
+            "status": "done",
+            "testStrategy": "Test environment detection across different runtime environments using Vitest with custom test environments, mock global objects to simulate different browser/Node.js scenarios",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Setup Dependency Injection Container",
+            "description": "Implement lightweight dependency injection container for managing converter dependencies and configuration",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create DIContainer class with register<T>(token: string, implementation) and resolve<T>(token: string) methods. Implement singleton and transient lifetime management for registered services. Add support for constructor injection and circular dependency detection. Create service registration helpers for common converter dependencies like loggers and configuration. Integrate with existing factory pattern for automatic dependency resolution. Place in src/architecture/di/ directory.",
+            "status": "done",
+            "testStrategy": "Test service registration and resolution, singleton vs transient lifetimes, circular dependency detection, and integration with converter factory for automatic dependency injection",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Progressive Enhancement Implementation with Browser Capability Detection",
+        "description": "Implement a 4-tier progressive enhancement system with Chrome CDP full functionality, canvas-based fallback, server-side fallback integration, and basic HTML export fallback with graceful degradation patterns.",
+        "details": "Based on the existing TypeScript project structure using Vite and Vitest, implement a comprehensive browser capability detection system. The project uses ESM modules and targets both Node.js and browser environments. Create a BrowserCapabilityDetector class that uses feature detection to determine Chrome CDP availability, canvas support, and network access. Implement Tier 1 with full Chrome DevTools Protocol integration using the chrome-remote-interface library for high-fidelity conversions including PDF, PNG, JPEG, and MHTML generation. Build Tier 2 with canvas-based conversion fallback using HTMLCanvasElement API for image generation and basic rendering when CDP is unavailable. Create Tier 3 with server-side fallback integration that can delegate to external conversion services when local capabilities are insufficient. Implement Tier 4 with basic HTML export functionality using native DOM manipulation and file download APIs. Design graceful degradation patterns that automatically select the highest available tier based on detected capabilities, provide user feedback about capability limitations, and maintain consistent API interfaces across all tiers. Include comprehensive error handling, timeout management, and fallback mechanisms for network failures, unsupported features, and resource constraints.",
+        "testStrategy": "Create comprehensive unit tests using Vitest for the BrowserCapabilityDetector class, testing each capability detection method across different browser environments. Implement integration tests for each conversion tier, mocking unavailable capabilities to verify fallback mechanisms. Build E2E tests using Playwright to verify the complete progressive enhancement flow from Tier 1 through Tier 4. Test graceful degradation patterns by simulating capability failures and ensuring appropriate fallback selection. Validate API consistency across all tiers to ensure consumers receive the same interface regardless of which tier is used. Include performance tests to measure conversion quality and speed across different tiers, ensuring fallback options provide acceptable results within reasonable timeframes.",
+        "status": "done",
+        "dependencies": [
+          "2"
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement BrowserCapabilityDetector Core Class",
+            "description": "Create the core BrowserCapabilityDetector class with feature detection methods for Chrome CDP, canvas support, and network access.",
+            "dependencies": [],
+            "details": "Create src/core/BrowserCapabilityDetector.ts class with TypeScript interfaces. Implement detectChromeCapability() using chrome-remote-interface availability check, detectCanvasSupport() using HTMLCanvasElement API detection, detectNetworkAccess() using fetch/XMLHttpRequest availability, and detectEnvironment() to distinguish Node.js vs browser contexts. Include capability scoring system and environment-specific detection patterns. Follow existing project patterns with ESM exports and TypeScript strict mode.",
+            "status": "done",
+            "testStrategy": "Unit tests using Vitest to mock different browser environments and validate each detection method returns correct boolean values and capability scores.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Tier 1 Chrome CDP Integration Layer",
+            "description": "Build the full Chrome DevTools Protocol integration tier with high-fidelity conversion capabilities for PDF, PNG, JPEG, and MHTML generation.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/tiers/ChromeCDPTier.ts implementing the ConverterStrategy interface. Integrate chrome-remote-interface library for CDP communication. Implement convert() method supporting PDF generation using Page.printToPDF, image generation using Page.screenshot with PNG/JPEG formats, and MHTML creation using Page.captureSnapshot. Include error handling for CDP connection failures, timeout management, and resource cleanup. Follow project's ESM module structure and TypeScript patterns.",
+            "status": "done",
+            "testStrategy": "Integration tests mocking Chrome CDP responses and unit tests for conversion logic. Test timeout handling, error recovery, and format-specific conversion parameters.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Tier 2 Canvas-Based Conversion Fallback",
+            "description": "Create canvas-based conversion fallback system using HTMLCanvasElement API for image generation when CDP is unavailable.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/tiers/CanvasTier.ts implementing canvas-based HTML rendering. Use HTMLCanvasElement with 2D context for basic HTML-to-image conversion. Implement DOM-to-canvas rendering using foreignObject SVG technique for HTML content, canvas.toDataURL() for image export, and basic styling preservation. Include fallback patterns for unsupported CSS features and graceful degradation for complex layouts. Follow existing TypeScript patterns and ESM structure.",
+            "status": "done",
+            "testStrategy": "Unit tests for canvas rendering logic and image generation. Mock HTMLCanvasElement API and test fallback behavior for various HTML structures and CSS features.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Tier 3 Server-Side Fallback Integration",
+            "description": "Build server-side fallback integration system that delegates to external conversion services when local capabilities are insufficient.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/tiers/ServerSideTier.ts for external service integration. Implement HTTP client using fetch API for service communication, configurable service endpoints with authentication support, and retry mechanisms with exponential backoff. Include service discovery patterns, health checking for external services, and graceful degradation when services are unavailable. Design API wrapper interfaces for popular conversion services and maintain consistent response formats across different providers.",
+            "status": "done",
+            "testStrategy": "Unit tests mocking HTTP responses and integration tests with service timeouts. Test retry logic, authentication flows, and error handling for various service failure scenarios.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Implement Progressive Enhancement Orchestration System",
+            "description": "Create the main orchestration system that automatically selects the highest available tier and provides graceful degradation with user feedback.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Create src/core/ProgressiveEnhancementManager.ts that orchestrates tier selection using BrowserCapabilityDetector results. Implement selectOptimalTier() method using capability scores, fallback chain management with automatic tier degradation, and unified API interface maintaining consistency across all tiers. Include user feedback system for capability limitations, conversion progress reporting, and comprehensive error handling with recovery strategies. Design plugin architecture for extending conversion capabilities and maintain backward compatibility.",
+            "status": "done",
+            "testStrategy": "Integration tests covering tier selection logic across different capability scenarios. End-to-end tests validating graceful degradation and user feedback systems with mocked capability detection results.",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "4",
+        "title": "React Integration Components with TypeScript",
+        "description": "Create comprehensive React hooks, components, and context providers for HTML converter functionality with TypeScript support and SSR compatibility.",
+        "details": "Based on the existing TypeScript project structure with Vite and browser capability detection, implement a complete React integration layer. Create a custom hook `useHTMLConverter` that manages converter state, provides methods for conversion operations, and handles progressive enhancement tiers automatically. The hook should integrate with the existing BrowserCapabilityDetector and Strategy pattern from tasks 2 and 3. Implement React components with TypeScript including: `HTMLConverterProvider` (Context provider), `ConversionProgressIndicator`, `ConversionStatusDisplay`, and `ErrorBoundary` integration. The components should follow the project's existing patterns and use the established converter architecture. Add React Context for global converter state management to handle conversion settings, user preferences, and status across the application. Implement Server-Side Rendering support by ensuring all components work without browser APIs during SSR and provide appropriate fallbacks. The integration should maintain the 4-tier progressive enhancement system established in task 3 and leverage the factory pattern from task 2 for converter instantiation.",
+        "testStrategy": "Create comprehensive React Testing Library tests for all hooks and components, testing both happy paths and error scenarios. Test the useHTMLConverter hook with mock converters and verify proper state management and progressive enhancement behavior. Test React Context provider with multiple consumer components to ensure proper state distribution. Test error boundaries by simulating conversion failures and verifying graceful degradation. Test SSR compatibility by rendering components in a Node.js environment without browser APIs. Test integration with existing BrowserCapabilityDetector to ensure proper capability detection and fallback behavior. Create visual regression tests using Storybook or similar tooling to verify component appearance across different states and themes.",
+        "status": "cancelled",
+        "dependencies": [
+          "2",
+          "3"
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create React Hook: useHTMLConverter",
+            "description": "Implement the core React hook that manages converter state and provides methods for conversion operations with TypeScript support.",
+            "dependencies": [],
+            "details": "Create a custom React hook `useHTMLConverter` in `src/hooks/useHTMLConverter.ts` that manages converter state, provides conversion methods, and handles progressive enhancement tiers automatically. The hook should return an object with properties: `{ convert, isConverting, progress, error, capabilities, tier }`. Include TypeScript interfaces for all return types and parameters. Implement state management using useState and useEffect hooks to track conversion progress, handle async operations, and manage error states. The hook should integrate with BrowserCapabilityDetector from task 2 and support the 4-tier progressive enhancement system from task 3.",
+            "status": "cancelled",
+            "testStrategy": "Create comprehensive React Testing Library tests for the hook using renderHook, testing state transitions, error handling, and integration with mock converter instances. Test progressive enhancement tier detection and conversion method calls.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-15T00:26:32.839Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement React Context Provider: HTMLConverterProvider",
+            "description": "Create a React Context provider for global converter state management with TypeScript definitions and SSR compatibility.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement `HTMLConverterProvider` component in `src/context/HTMLConverterContext.tsx` that provides global state management for converter settings, user preferences, and status across the application. Create TypeScript interfaces for context value including `HTMLConverterContextType` with properties for global settings, converter instances, and shared state. The provider should wrap the application and make converter functionality available to all child components. Include proper defaultValue for SSR compatibility and implement context methods for updating global converter preferences. Use React.createContext with proper TypeScript generics and export both the context and a custom hook `useHTMLConverterContext` for consuming the context.",
+            "status": "cancelled",
+            "testStrategy": "Test the context provider with multiple consumer components, verify proper state sharing and updates across components. Test SSR compatibility by ensuring the provider works without browser APIs during server-side rendering.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-15T00:26:38.765Z"
+          },
+          {
+            "id": 3,
+            "title": "Build React Components: Progress and Status Display",
+            "description": "Create React components for conversion progress indication and status display with TypeScript props and accessibility features.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement `ConversionProgressIndicator` and `ConversionStatusDisplay` components in `src/components/` directory. ConversionProgressIndicator should show real-time conversion progress with a progress bar, percentage display, and estimated time remaining. ConversionStatusDisplay should show current conversion status, success/error states, and detailed status messages. Both components should accept TypeScript props interfaces (`ConversionProgressProps`, `ConversionStatusProps`) and follow React best practices. Include proper ARIA attributes for accessibility, loading states, and error handling. Components should integrate with the HTMLConverterContext to display real-time status updates and progress information from active conversions.",
+            "status": "cancelled",
+            "testStrategy": "Test components with various progress states and status values using React Testing Library. Verify accessibility attributes with axe-core integration and test responsive behavior across different screen sizes. Test real-time updates when connected to context.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-15T00:26:45.529Z"
+          },
+          {
+            "id": 4,
+            "title": "Implement Error Boundary Integration",
+            "description": "Create React Error Boundary component specifically for HTML converter operations with TypeScript error types and recovery mechanisms.",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement `HTMLConverterErrorBoundary` component in `src/components/HTMLConverterErrorBoundary.tsx` that catches and handles errors from converter operations. The component should implement React's Error Boundary pattern with componentDidCatch and getDerivedStateFromError methods (or useErrorBoundary hook for functional components). Include TypeScript error types specific to converter operations and provide user-friendly error messages. Implement error recovery mechanisms such as retry functionality and fallback UI states. The error boundary should log errors appropriately and provide options for users to report issues or try alternative conversion methods. Include integration with the HTMLConverterContext to reset converter state when errors occur.",
+            "status": "cancelled",
+            "testStrategy": "Test error boundary behavior by intentionally throwing errors in child components and verifying proper error catching and display. Test error recovery mechanisms and verify that the boundary properly resets converter state after errors.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-15T00:26:47.689Z"
+          },
+          {
+            "id": 5,
+            "title": "Implement SSR Support and Browser API Fallbacks",
+            "description": "Ensure all React components work properly during Server-Side Rendering with appropriate fallbacks for browser-only APIs and progressive enhancement.",
+            "dependencies": [
+              4
+            ],
+            "details": "Implement comprehensive SSR support by ensuring all components can render without browser APIs during server-side rendering. Create `src/utils/ssrHelpers.ts` with utilities like `isBrowser()` and `useIsomorphicLayoutEffect`. Modify all components to check for browser environment before accessing window, document, or other browser-only APIs. Implement progressive enhancement by rendering basic functionality on the server and enhancing with full functionality on the client. Add proper hydration handling to prevent hydration mismatches. Ensure the HTMLConverterContext provides appropriate default values during SSR and properly initializes on the client. Include TypeScript types for SSR-specific props and create higher-order components or hooks for common SSR patterns.",
+            "status": "cancelled",
+            "testStrategy": "Test SSR compatibility by running components in a Node.js environment without browser APIs. Verify that hydration works correctly by testing server-rendered markup against client-rendered markup. Test progressive enhancement by ensuring basic functionality works even when JavaScript is disabled.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-15T00:26:49.893Z"
+          }
+        ],
+        "updatedAt": "2025-10-15T00:26:49.893Z"
+      },
+      {
+        "id": "5",
+        "title": "Phase 5.3: Accessibility Implementation (WCAG 2.1 AA)",
+        "description": "Implement comprehensive accessibility features including ARIA labels, semantic HTML, keyboard navigation, screen reader compatibility, focus management, high contrast mode, and accessibility testing suite.",
+        "status": "done",
+        "dependencies": [
+          "3"
+        ],
+        "priority": "medium",
+        "details": "Implement WCAG 2.1 AA compliant accessibility features for the core conversion system without React components. Focus on semantic HTML structure and ARIA labels for the direct converter interface and API endpoints. Create comprehensive keyboard navigation support for the web-based conversion interface with tab order management, skip links, and keyboard shortcuts for converter operations. Implement screen reader compatibility using proper ARIA live regions for conversion progress announcements, status updates, and descriptive labels for all form elements and conversion controls. Develop focus management strategies including visible focus indicators, programmatic focus control for dynamic content updates in the conversion interface, and focus management for modal dialogs or progress indicators. Add high contrast mode support using CSS custom properties and media queries for system preference detection in the conversion interface. Create a comprehensive accessibility testing suite using axe-core for automated testing, manual testing protocols, and validation of conversion workflows with assistive technologies. Integration with the progressive enhancement system from task 3 to ensure accessibility across all capability tiers.",
+        "testStrategy": "Implement automated accessibility testing using axe-core integrated with Vitest for continuous validation of the core conversion interface. Create manual testing protocols with screen readers (NVDA, JAWS, VoiceOver) and keyboard-only navigation for direct API usage scenarios. Test focus management across all interactive elements in the conversion interface. Validate high contrast mode functionality and color contrast ratios using WebAIM tools. Conduct user journey testing for conversion workflows with assistive technologies focusing on the direct conversion interface. Create accessibility regression tests to prevent violations in future updates. Verify semantic HTML structure using HTML5 validator and ARIA validation tools for the core converter pages.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement semantic HTML structure and ARIA labeling",
+            "description": "Create semantic HTML foundation with proper heading hierarchy, landmarks, and comprehensive ARIA labels throughout the converter interface",
+            "dependencies": [],
+            "details": "Update the core conversion interface to use semantic HTML elements (main, section, article, nav, aside) without React components. Implement proper heading hierarchy (h1-h6) for screen readers in the conversion interface. Add ARIA labels, descriptions, and roles to all interactive elements including conversion buttons, file upload controls, and form elements. Create ARIA landmarks for main conversion areas, file selection sections, and progress indicators. Ensure all images in the interface have appropriate alt text and decorative images are marked with empty alt attributes.",
+            "status": "done",
+            "testStrategy": "Use axe-core automated testing to validate semantic structure and ARIA implementation in the core conversion interface. Manual testing with screen readers to verify proper announcement and navigation flow.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement comprehensive keyboard navigation and shortcuts",
+            "description": "Create full keyboard navigation support with tab order management, skip links, and keyboard shortcuts for all converter functions",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement logical tab order throughout the direct conversion interface with tabindex management. Create skip links for main content areas and converter sections. Add keyboard shortcuts for common conversion actions (Ctrl+Enter for convert, Ctrl+D for download) in the web interface. Implement proper focus trapping within modal dialogs and dropdowns for file selection and conversion options. Ensure all interactive elements in the conversion interface are keyboard accessible with Enter and Space key support.",
+            "status": "done",
+            "testStrategy": "Manual keyboard-only navigation testing across all conversion interface features. Automated testing for focus management and tab order validation using custom test utilities.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement screen reader compatibility with ARIA live regions",
+            "description": "Create screen reader support using ARIA live regions for dynamic content updates and conversion progress announcements",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement ARIA live regions for conversion progress updates, error messages, and status announcements in the direct interface. Create descriptive labels for all form controls and interactive elements related to file upload and conversion settings. Add ARIA descriptions for complex UI patterns in the conversion options and file selection. Implement proper announcement strategies for file uploads, conversion completion, and error states without React state management. Ensure dynamic content changes are properly announced to screen readers.",
+            "status": "done",
+            "testStrategy": "Testing with NVDA, JAWS, and VoiceOver screen readers to verify proper announcements and navigation in the conversion interface. Validate ARIA live region behavior across different conversion scenarios.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement focus management and high contrast mode support",
+            "description": "Develop focus management strategies with visible indicators and high contrast mode using CSS custom properties",
+            "dependencies": [
+              2
+            ],
+            "details": "Create visible focus indicators that meet WCAG contrast requirements across all interactive elements in the conversion interface. Implement programmatic focus management for dynamic content updates and modal dialogs without React hooks. Add high contrast mode support using CSS custom properties and prefers-contrast media queries for the conversion interface. Ensure focus indicators remain visible in high contrast mode. Implement focus restoration after modal close and dynamic content changes in the direct interface.",
+            "status": "done",
+            "testStrategy": "Visual testing of focus indicators across different themes and contrast modes in the conversion interface. Automated testing for focus management behavior in dynamic scenarios using Playwright.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create comprehensive accessibility testing suite",
+            "description": "Build automated and manual accessibility testing protocols using axe-core integration and screen reader validation workflows",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Integrate axe-core with Vitest for automated accessibility testing of the core conversion interface in CI/CD pipeline. Create custom accessibility test utilities for direct HTML interface elements. Develop manual testing protocols for screen reader compatibility, keyboard navigation, and high contrast mode specific to conversion workflows. Implement accessibility regression testing for all conversion user journeys. Create documentation for accessibility testing procedures and WCAG 2.1 AA compliance validation for the direct conversion system.",
+            "status": "done",
+            "testStrategy": "Automated axe-core testing integrated with existing Vitest suite for the core interface. Manual validation protocols using multiple screen readers and assistive technologies for conversion workflows. Accessibility audit checklist for all new conversion features and interface elements.",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Implement MHTML Converter with CDP Integration",
+        "description": "Build MHTML converter that generates MHTML format using Chrome DevTools Protocol. Handles external dependency detection, page navigation, resource capture, and intermediate MHTML generation for other converters. Essential for progressive enhancement tier system.",
+        "details": "Based on FSD section 5.1 and 4.4:\n\n## Core Components:\n\n### 1. MHTML Converter Class (src/converters/mhtml/mhtml-converter.ts)\n- Extend BaseConverter with MHTML-specific logic\n- Implement convert() method for direct MHTML output\n- Handle both direct MHTML conversion and intermediate generation\n- Support MHTML-specific options (keepResources, compression)\n\n### 2. MHTML Builder (src/converters/mhtml/mhtml-builder.ts)  \n- Build MHTML format according to RFC 2557\n- Generate proper MIME boundaries and headers\n- Handle content encoding (base64 for binary, quoted-printable for text)\n- Process external resources (CSS, JS, images)\n\n### 3. Integration with MHTMLProcessor (src/core/engine/mhtml-processor.ts)\n- External dependency detection using regex patterns\n- Chrome CDP integration for Page.captureSnapshot\n- File saving with secure temp directory management\n- Resource cleanup and error handling\n\n## Key Features:\n- Detect external dependencies (links, scripts, images, iframes, CSS imports)\n- Generate MHTML using Chrome's captureSnapshot API\n- Support both direct MHTML output and intermediate generation\n- Handle large content with streaming capabilities\n- Secure temp file handling with proper permissions\n- Comprehensive error handling and logging\n\n## Dependencies:\n- Chrome DevTools Protocol (CDP) for page capture\n- Node.js fs module for file operations\n- Existing BaseConverter and ConversionContext interfaces\n- ResourceManager for temp directory management\n\n## Testing:\n- Unit tests for MHTML generation accuracy\n- Integration tests with Chrome CDP\n- External dependency detection validation\n- File I/O and cleanup verification",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "2"
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create MHTML Converter Base Structure",
+            "description": "Implement the base MHTML converter class structure with BaseConverter interface and core conversion method",
+            "dependencies": [],
+            "details": "Create src/converters/mhtml/mhtml-converter.ts extending BaseConverter interface. Implement constructor, basic convert() method signature, and MHTML-specific option handling. Set up class structure for both direct MHTML output and intermediate generation capabilities.",
+            "status": "done",
+            "testStrategy": "Unit tests for class instantiation, option validation, and method signatures",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement MHTML Builder with RFC 2557 Compliance",
+            "description": "Build MHTML format generator following RFC 2557 specifications with proper MIME boundaries and content encoding",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/converters/mhtml/mhtml-builder.ts implementing RFC 2557 MHTML format. Generate proper MIME boundaries and headers, handle content encoding (base64 for binary, quoted-printable for text), and process external resources including CSS, JS, and images.",
+            "status": "done",
+            "testStrategy": "Unit tests for MIME boundary generation, content encoding accuracy, and RFC 2557 compliance validation",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Integrate Chrome DevTools Protocol for Page Capture",
+            "description": "Implement Chrome CDP integration using Page.captureSnapshot API for MHTML generation",
+            "dependencies": [
+              2
+            ],
+            "details": "Create CDP integration in src/core/engine/mhtml-processor.ts using Chrome's Page.captureSnapshot API. Handle page navigation, resource capture, and snapshot generation. Implement connection management, error handling for CDP failures, and proper Chrome process lifecycle management.",
+            "status": "done",
+            "testStrategy": "Integration tests with real Chrome instance, CDP connection validation, and snapshot generation accuracy tests",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement External Dependency Detection System",
+            "description": "Build comprehensive external dependency detection using regex patterns for links, scripts, images, and CSS imports",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement external dependency detection in the MHTML processor using regex patterns to identify external links, scripts, images, iframes, and CSS imports. Create dependency categorization system and resource collection logic for complete MHTML generation.",
+            "status": "done",
+            "testStrategy": "Unit tests for regex pattern accuracy, dependency categorization, and edge case handling for various HTML structures",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Add Resource Management and File Operations",
+            "description": "Implement secure temp file handling, resource cleanup, streaming capabilities, and comprehensive error handling",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Create secure temp directory management with proper file permissions, implement streaming capabilities for large content, add comprehensive error handling and logging, and ensure proper resource cleanup. Include file I/O operations with security controls and memory-efficient processing.",
+            "status": "done",
+            "testStrategy": "Integration tests for file operations, security validation for temp file handling, memory usage tests for large files, and cleanup verification",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Implement CDP Management System with Adapter Pattern",
+        "description": "Build comprehensive CDP management system using Adapter pattern for environment abstraction. Implement ICDPManager interface, NodeCDPManager for Chrome launching/chrome-remote-interface, and BrowserCDPManager for Chrome extension debugging API. Critical for all conversion operations.",
+        "details": "Based on FSD section 6 (CDP Management):\n\n## Core Components:\n\n### 1. CDP Manager Interface (src/adapters/cdp-manager.interface.ts)\n- Define ICDPManager interface with environment-agnostic methods\n- Connect/disconnect with configurable options\n- Execute CDP commands with error handling\n- Event handling system for CDP events\n- Environment detection and type definitions\n\n### 2. Node.js CDP Implementation (src/adapters/node/cdp-manager.node.ts)\n- Chrome process launching with chrome-launcher\n- CDP client connection via chrome-remote-interface\n- Domain enablement (Page, Network, Runtime, DOM)\n- Secure Chrome flags configuration for sandboxing\n- Connection pooling and cleanup\n- Event listener management\n\n### 3. Browser Extension CDP Implementation (src/adapters/browser/cdp-manager.browser.ts)\n- Chrome extension debugging API integration\n- Tab detection and attachment\n- Command execution via chrome.debugger.sendCommand\n- Event handling for debugger events\n- Extension manifest integration\n- Cross-browser compatibility\n\n### 4. Chrome Launcher Integration (src/adapters/node/chrome-launcher.ts)\n- Configurable Chrome process spawning\n- Security-focused flag configuration\n- User data directory management\n- Port assignment and detection\n- Process lifecycle management\n\n## Key Features:\n- Environment-agnostic interface for seamless switching\n- Robust error handling and recovery\n- Connection state management\n- Event-driven architecture\n- Security sandboxing with proper Chrome flags\n- Memory leak prevention through proper cleanup\n- Configurable timeouts and retry logic\n\n## Security Considerations:\n- NEVER use --no-sandbox in production without specific context\n- NEVER expose remote debugging ports\n- Use secure temp directories with restricted permissions\n- Validate all Chrome configuration flags\n- Implement proper process isolation\n\n## Dependencies:\n- chrome-launcher for Node.js Chrome management\n- chrome-remote-interface for CDP communication\n- Chrome extension APIs for browser environment\n- Existing error handling and logging systems\n\n## Integration Points:\n- Used by all format converters\n- Required by MHTMLProcessor\n- Essential for ConversionEngine\n- Integrated with ResourceManager for cleanup",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "2"
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create CDP Manager Interface with TypeScript definitions",
+            "description": "Implement the ICDPManager interface with environment-agnostic methods for CDP operations, including connection management, command execution, and event handling system.",
+            "dependencies": [],
+            "details": "Create src/adapters/cdp-manager.interface.ts with ICDPManager interface defining connect/disconnect methods with configurable options, executeCDPCommand method with error handling, event handling system for CDP events, and environment detection types. Include CDPConnectionOptions, CDPCommand, CDPEvent, and CDPEnvironment type definitions.",
+            "status": "done",
+            "testStrategy": "Unit tests for interface compliance and type definitions validation",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Install CDP and Chrome launcher dependencies",
+            "description": "Add required dependencies for Chrome DevTools Protocol communication and Chrome process management to package.json.",
+            "dependencies": [
+              1
+            ],
+            "details": "Install chrome-launcher for Node.js Chrome management, chrome-remote-interface for CDP communication, and related type definitions. Update package.json with appropriate versions and ensure compatibility with existing TypeScript setup.",
+            "status": "done",
+            "testStrategy": "Verify dependencies install correctly and type definitions are available",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Chrome Launcher integration with security configurations",
+            "description": "Create Chrome launcher utility with configurable process spawning, security-focused flag configuration, and process lifecycle management.",
+            "dependencies": [
+              2
+            ],
+            "details": "Create src/adapters/node/chrome-launcher.ts with ChromeLauncher class implementing configurable Chrome process spawning, security-focused flag configuration (excluding --no-sandbox), user data directory management with restricted permissions, port assignment and detection, and proper process lifecycle management with cleanup.",
+            "status": "done",
+            "testStrategy": "Unit tests for Chrome process spawning, flag validation, and cleanup verification",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Node.js CDP Manager with chrome-remote-interface",
+            "description": "Build Node.js implementation of ICDPManager using chrome-launcher and chrome-remote-interface for Chrome process management and CDP communication.",
+            "dependencies": [
+              3
+            ],
+            "details": "Create src/adapters/node/cdp-manager.node.ts implementing NodeCDPManager class with Chrome process launching via chrome-launcher, CDP client connection via chrome-remote-interface, domain enablement (Page, Network, Runtime, DOM), connection pooling and cleanup, event listener management, and robust error handling with connection state management.",
+            "status": "done",
+            "testStrategy": "Integration tests with real Chrome instances, connection management tests, and error scenario validation",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Implement Browser Extension CDP Manager with debugging API",
+            "description": "Build browser extension implementation of ICDPManager using Chrome extension debugging API for tab attachment and command execution.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/adapters/browser/cdp-manager.browser.ts implementing BrowserCDPManager class with Chrome extension debugging API integration, tab detection and attachment mechanisms, command execution via chrome.debugger.sendCommand, event handling for debugger events, extension manifest integration requirements, and cross-browser compatibility considerations.",
+            "status": "done",
+            "testStrategy": "Browser environment tests with Chrome extension APIs, tab management validation, and cross-browser compatibility testing",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Implement Configuration System with Multi-Source Loading",
+        "description": "Build comprehensive configuration management system with ConfigLoader class. Support configuration loading from files (html-converter.config.json, .html-converter.json), environment variables, and programmatic sources. Include JSON schema validation, configuration merging, and format-specific defaults.",
+        "details": "Based on FSD section 8 (Configuration System):\n\n## Core Components:\n\n### 1. ConfigLoader Class (src/config/loader.ts)\n- Multi-source configuration loading (files, env vars, programmatic)\n- Configuration discovery in common locations\n- Deep merge logic for configuration hierarchy\n- JSON schema validation with detailed error messages\n- Environment variable mapping with type conversion\n\n### 2. Default Configuration (src/config/defaults.ts)\n- Default values for all conversion options\n- Format-specific configurations (PDF, Image, Markdown, DOCX)\n- Security-focused defaults (sandboxing, timeouts)\n- Performance-optimized defaults (retries, concurrency)\n\n### 3. Configuration Schema (src/config/schema.ts)\n- JSON Schema definition for validation\n- Type safety for all configuration options\n- Validation rules for numeric ranges and allowed values\n- Custom validation functions for complex scenarios\n\n### 4. Configuration Merger (src/config/merger.ts)\n- Deep merge algorithm for configuration objects\n- Priority-based merging (cli > env > file > defaults)\n- Array handling strategies (replace vs merge)\n- Validation during merge process\n\n## Configuration Sources Priority:\n1. Command line options (highest priority)\n2. Environment variables (HTML_CONVERTER_*)\n3. Configuration files (html-converter.config.json)\n4. Default values (lowest priority)\n\n## Supported Configuration Files:\n- html-converter.config.json\n- .html-converter.json  \n- .html-converterrc\n\n## Environment Variables:\n- HTML_CONVERTER_MAX_RETRIES\n- HTML_CONVERTER_TIMEOUT\n- HTML_CONVERTER_VERBOSE\n- HTML_CONVERTER_CHROME_PATH\n- More format-specific variables as needed\n\n## Format-Specific Configurations:\n### PDF Configuration:\n- layout (standard, single-page)\n- pageSize (A4, Letter, custom)\n- margins (CSS units)\n- scale factor\n- printBackground\n- header/footer templates\n\n### Image Configuration:\n- quality (1-100)\n- layout (standard, single-page)\n- viewport dimensions\n- clip regions\n- omitBackground\n\n### Markdown Configuration:\n- flavor (gfm, commonmark)\n- embedImages (boolean)\n- headingStyle (atx, setext)\n- bulletMarker (-, *, +)\n- imageAssetPath\n\n### DOCX Configuration:\n- preserveStyle (boolean)\n- fontFamily\n- fontSize\n- pageLayout (size, orientation, margins)\n\n## Validation Rules:\n- maxRetries: 0-10\n- timeout: 1000ms-300000ms\n- quality: 1-100\n- Scale: 0.1-3.0\n- File paths validation\n- URL format validation\n\n## Error Handling:\n- Detailed validation error messages\n- File not found handling\n- Invalid JSON parsing\n- Schema validation failures\n- Environment variable type conversion errors\n\n## Integration:\n- Used by ConversionEngine for default options\n- CLI options override configuration\n- Environment-specific configurations\n- Extension configuration support",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "1"
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Configuration Schema and Type Definitions",
+            "description": "Implement JSON schema validation and TypeScript type definitions for configuration system with format-specific options and validation rules.",
+            "dependencies": [],
+            "details": "Create src/config/schema.ts with comprehensive JSON Schema definition for all configuration options. Include TypeScript interfaces for Config, PDFOptions, ImageOptions, MarkdownOptions, DOCXOptions. Define validation rules for numeric ranges (maxRetries: 0-10, timeout: 1000-300000ms, quality: 1-100, scale: 0.1-3.0). Add custom validation functions for file paths and URL formats. Export schema validation function that provides detailed error messages for invalid configurations.",
+            "status": "done",
+            "testStrategy": "Unit tests for schema validation with valid/invalid configurations, type checking tests, boundary value testing for numeric ranges",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Default Configuration Values",
+            "description": "Create comprehensive default configuration with security-focused and performance-optimized settings for all conversion formats.",
+            "dependencies": [],
+            "details": "Create src/config/defaults.ts with default values for all conversion options. Include format-specific defaults: PDF (A4 page size, standard layout, security settings), Image (quality: 80, viewport: 1920x1080), Markdown (GFM flavor, embed images), DOCX (preserve style, standard fonts). Set security-focused defaults (enable sandboxing, 30s timeout, 3 retries). Performance-optimized defaults for concurrency and resource management. Export getDefaults() function returning complete Config object.",
+            "status": "done",
+            "testStrategy": "Validation tests for all default values, security setting verification, format-specific default coverage tests",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build Configuration Merger with Priority System",
+            "description": "Implement deep merge algorithm for configuration objects with priority-based merging and array handling strategies.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create src/config/merger.ts with ConfigMerger class implementing deep merge algorithm. Support priority-based merging: CLI options > environment variables > configuration files > defaults. Handle array merging strategies (replace vs merge based on configuration type). Implement validation during merge process to catch conflicts early. Include special handling for nested objects, environment variable type conversion, and configuration inheritance. Export merge() function accepting multiple configuration sources.",
+            "status": "done",
+            "testStrategy": "Unit tests for merge priority handling, array merge strategies, nested object merging, validation during merge, edge cases",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Environment Variable Mapping",
+            "description": "Create environment variable mapping system with type conversion and validation for HTML_CONVERTER_* variables.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/config/env-mapper.ts with EnvironmentMapper class for parsing HTML_CONVERTER_* environment variables. Support automatic type conversion (string to number/boolean), nested configuration mapping (HTML_CONVERTER_PDF_QUALITY), and validation against schema. Include mapping for HTML_CONVERTER_MAX_RETRIES, HTML_CONVERTER_TIMEOUT, HTML_CONVERTER_VERBOSE, HTML_CONVERTER_CHROME_PATH and format-specific variables. Handle parsing errors gracefully with detailed error messages. Export mapEnvironmentVariables() function.",
+            "status": "done",
+            "testStrategy": "Environment variable parsing tests, type conversion validation, error handling for invalid values, nested configuration mapping tests",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create Multi-Source ConfigLoader Class",
+            "description": "Build the main ConfigLoader class supporting configuration discovery, file loading, and multi-source integration with validation.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Create src/config/loader.ts with ConfigLoader class as main entry point. Implement configuration file discovery in common locations (html-converter.config.json, .html-converter.json, .html-converterrc). Support multi-source loading (files, environment variables, programmatic sources) with proper error handling. Integration with ConfigMerger for priority-based merging and EnvironmentMapper for env var processing. Include JSON parsing with detailed error messages, file existence checking, and validation using schema. Export async load() method and static convenience methods.",
+            "status": "done",
+            "testStrategy": "Integration tests for multi-source loading, file discovery tests, error handling for missing/invalid files, schema validation integration tests",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Implement Structured Error Handling System",
+        "description": "Build comprehensive error handling system with ConversionError class, standardized error codes, and ErrorHandler class. Map common Node.js/Chrome errors to structured instances with user-friendly messages. Include error context preservation, debugging information, and recovery mechanisms.",
+        "details": "Based on FSD section 7 (Error Handling):\n\n## Core Components:\n\n### 1. ConversionError Class (src/core/errors/conversion-error.ts)\n- Structured error class with standardized error codes\n- Error context preservation (timestamp, details, stack trace)\n- JSON serialization for logging/debugging\n- String representation with error codes\n- Error categorization (NETWORK_ERROR, TIMEOUT, INVALID_INPUT, etc.)\n\n### 2. ErrorHandler Class (src/core/errors/error-handler.ts)\n- Error normalization from various sources\n- User-friendly message generation\n- Custom error handler integration\n- Error logging with context\n- Recovery strategy suggestions\n\n### 3. Error Codes (src/core/errors/error-codes.ts)\n- Comprehensive error code definitions\n- Error category organization\n- Error severity levels\n- Recovery suggestions mapping\n\n## Error Code Categories:\n### Network Errors:\n- NETWORK_ERROR: Connection failures, DNS issues\n- TIMEOUT: Operation timeouts\n- RESOURCE_ERROR: Failed to load external resources\n\n### Input Errors:\n- INVALID_INPUT: Malformed file paths, URLs, HTML\n- INVALID_FORMAT: Unsupported output format\n- VALIDATION_ERROR: Option validation failures\n\n### System Errors:\n- CDP_ERROR: Chrome DevTools Protocol failures\n- FILE_SYSTEM_ERROR: File I/O failures\n- MEMORY_ERROR: Out of memory conditions\n\n### Conversion Errors:\n- CONVERSION_FAILED: General conversion failures\n- RENDERING_ERROR: Page rendering issues\n- EXPORT_ERROR: File export failures\n\n## Error Features:\n- Structured error context with metadata\n- Stack trace preservation for debugging\n- Timestamp and duration tracking\n- Error correlation across conversion pipeline\n- Retry suggestion integration\n- Graceful degradation strategies\n\n## Error Recovery Strategies:\n- Network errors: Retry with exponential backoff\n- Timeout errors: Increase timeout or simplify content\n- Invalid input: Provide specific guidance\n- CDP errors: Check Chrome installation/permissions\n- Resource errors: Continue without missing resources\n\n## Integration Points:\n- Used by all conversion components\n- Integrated with CLI for user messaging\n- Logger integration for debugging\n- Configuration system for error handling preferences\n- Testing framework for error simulation\n\n## Error Message Examples:\n- \"Network connection failed. Please check your internet connection and try again.\"\n- \"The conversion took too long and was cancelled. Try increasing the timeout or simplifying the content.\"\n- \"Failed to communicate with Chrome. Make sure Chrome is installed and up to date.\"\n- \"The provided input is invalid. Please check the file path or URL.\"\n\n## Security Considerations:\n- Sanitize error messages to prevent information leakage\n- Avoid exposing file paths or internal system details\n- Log detailed errors but show user-friendly summaries\n- Error rate limiting to prevent log flooding",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "2"
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create ConversionError Class with Error Codes",
+            "description": "Implement the core ConversionError class with standardized error codes, context preservation, and JSON serialization capabilities.",
+            "dependencies": [],
+            "details": "Create src/core/errors/conversion-error.ts with ConversionError class extending Error. Include error code enum, timestamp, context metadata, stack trace preservation, JSON serialization methods, and string representation. Implement error categorization for NETWORK_ERROR, TIMEOUT, INVALID_INPUT, CDP_ERROR, FILE_SYSTEM_ERROR, MEMORY_ERROR, CONVERSION_FAILED, RENDERING_ERROR, EXPORT_ERROR categories.",
+            "status": "done",
+            "testStrategy": "Unit tests for error instantiation, serialization, categorization, and context preservation. Test error code validation and message formatting.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Define Comprehensive Error Codes and Categories",
+            "description": "Create standardized error code definitions with categories, severity levels, and recovery suggestions mapping.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/core/errors/error-codes.ts with comprehensive error code enums organized by category (Network, Input, System, Conversion). Define severity levels (LOW, MEDIUM, HIGH, CRITICAL) and recovery strategy mappings. Include specific codes for network failures, timeouts, invalid inputs, CDP failures, file system errors, and conversion failures with associated user-friendly messages.",
+            "status": "done",
+            "testStrategy": "Unit tests for error code completeness, category organization, and recovery suggestion mappings. Validate error code uniqueness and message quality.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement ErrorHandler Class for Error Normalization",
+            "description": "Build the ErrorHandler class to normalize errors from various sources and generate user-friendly messages with recovery suggestions.",
+            "dependencies": [
+              2
+            ],
+            "details": "Create src/core/errors/error-handler.ts with ErrorHandler class providing error normalization from Node.js errors, Chrome CDP errors, and custom errors. Implement user-friendly message generation, custom error handler integration, structured logging with context, and recovery strategy suggestions. Include error mapping logic to convert common Node.js/Chrome errors to ConversionError instances.",
+            "status": "done",
+            "testStrategy": "Unit tests for error normalization from different sources, message generation quality, recovery suggestion accuracy, and logging integration. Test edge cases and error transformation scenarios.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Error Context and Recovery Mechanisms",
+            "description": "Add comprehensive error context preservation, debugging information capture, and automated recovery strategy implementation.",
+            "dependencies": [
+              3
+            ],
+            "details": "Enhance error handling system with detailed context preservation including operation timestamps, duration tracking, correlation IDs across conversion pipeline, and stack trace analysis. Implement recovery mechanisms with exponential backoff for network errors, timeout adjustments, input validation guidance, and graceful degradation strategies. Add error rate limiting and security sanitization to prevent information leakage.",
+            "status": "done",
+            "testStrategy": "Integration tests for error context flow through conversion pipeline, recovery mechanism effectiveness, and security sanitization. Test error correlation and debugging information quality.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create Error Handler Integration Points and Documentation",
+            "description": "Integrate error handling system with existing codebase components and create comprehensive documentation with usage examples.",
+            "dependencies": [
+              4
+            ],
+            "details": "Update src/index.ts to export error classes and types. Create integration points for CLI error messaging, logger integration, and configuration system. Implement error simulation utilities for testing. Add comprehensive JSDoc documentation with usage examples, error message samples, and integration guides. Ensure TypeScript type exports are properly configured for external library consumers.",
+            "status": "done",
+            "testStrategy": "End-to-end tests for error handling integration across the conversion pipeline. Test TypeScript type exports, documentation examples, and error simulation utilities.",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Implement Comprehensive Testing Strategy",
+        "description": "Build multi-layered testing strategy with unit tests (90% coverage), integration tests, E2E tests with real Chrome, visual regression testing, and performance benchmarking. Support test matrix across Node.js/Chrome versions and OS platforms. Include fixtures, golden outputs, and test utilities.",
+        "details": "Based on FSD section 9 (Testing Strategy):\n\n## Testing Structure:\n\n### 1. Unit Tests (tests/unit/) - 90% Coverage Target\n#### Core Components:\n- Conversion Engine tests (conversion-engine.test.ts)\n- Input Handler tests (input-handler.test.ts) \n- MHTML Processor tests (mhtml-processor.test.ts)\n- Resource Manager tests (resource-manager.test.ts)\n- Error Handler tests (conversion-error.test.ts)\n\n#### Converters:\n- PDF Converter tests (pdf-converter.test.ts)\n- Image Converter tests (image-converter.test.ts)\n- Markdown Converter tests (markdown-converter.test.ts)\n- DOCX Converter tests (docx-converter.test.ts)\n- MHTML Converter tests (mhtml-converter.test.ts)\n\n#### Adapters:\n- Node CDP Manager tests (node-cdp-manager.test.ts)\n- Browser CDP Manager tests (browser-cdp-manager.test.ts - mocked)\n- Configuration Loader tests (config.test.ts)\n\n#### CLI:\n- Parser tests (parser.test.ts)\n- Commands tests (commands.test.ts)\n\n### 2. Integration Tests (tests/integration/)\n- End-to-end conversion flow tests\n- MHTML to PDF conversion tests\n- Remote URL conversion tests\n- Error recovery tests\n- Cross-format conversion tests\n\n### 3. End-to-End Tests (tests/e2e/)\n- CLI conversion tests with real Chrome\n- API conversion tests\n- Multi-format conversion tests\n- Real-world page conversion tests\n- Performance validation tests\n\n### 4. Visual Regression Tests (tests/visual/)\n- PDF snapshot comparison tests\n- PNG snapshot comparison tests\n- Output consistency validation\n- Cross-platform output verification\n- Update snapshot workflows\n\n### 5. Performance Benchmarks (tests/performance/)\n- Conversion speed benchmarks\n- Memory usage benchmarks\n- Concurrent conversion benchmarks\n- Scalability tests\n- Resource utilization monitoring\n\n## Test Matrix Requirements:\n\n### Environment Coverage:\n| Environment | Node Version | Chrome Version | OS | Priority |\n|-------------|--------------|----------------|-----|----------|\n| Node.js | 18.x | 90 - 130 | Ubuntu 20.04 | P0 |\n| Node.js | 20.x | 90 - 130 | Ubuntu 22.04 | P0 |\n| Node.js | 22.x | 90 - 130 | Ubuntu 22.04 | P1 |\n| Node.js | 18.x | 90 - 130 | macOS 11+ | P0 |\n| Node.js | 20.x | 90 - 130 | macOS 11+ | P0 |\n| Node.js | 18.x | 90 - 130 | Windows 10+ | P1 |\n| Extension | N/A | 110+ | All | P0 |\n\n## Test Fixtures (tests/fixtures/):\n### HTML Files:\n- simple.html (basic structure)\n- complex.html (rich content, styles, scripts)\n- external-resources.html (CDN dependencies)\n- single-page-layout.html (layout testing)\n- large-document.html (performance testing)\n\n### Golden Outputs:\n- PDF reference outputs\n- Image reference outputs\n- Markdown reference outputs\n- DOCX reference outputs\n- MHTML reference outputs\n\n## Test Utilities (tests/utils/):\n- Mock CDP implementation\n- Test HTTP server for remote URL testing\n- File comparison utilities\n- Assertion helpers\n- Test data generators\n\n## Testing Tools Integration:\n- Vitest for unit/integration tests\n- Playwright for E2E testing\n- Custom visual regression comparison\n- Performance monitoring integration\n- Coverage reporting with threshold enforcement\n\n## CI/CD Integration:\n- Automated test execution on PR\n- Coverage reporting with minimum thresholds\n- Performance regression detection\n- Visual regression diff reporting\n- Multi-platform test matrix execution\n\n## Quality Gates:\n- Unit test coverage ≥ 90%\n- All integration tests passing\n- E2E tests passing on all target platforms\n- No visual regression failures\n- Performance benchmarks within acceptable ranges\n- Security validation tests passing",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "3"
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up testing infrastructure and core unit tests",
+            "description": "Configure Vitest testing framework, set up test structure with tests/unit/, tests/integration/, tests/e2e/ directories, and implement unit tests for core components (ConversionEngine, InputHandler, MHTMLProcessor, ResourceManager, ErrorHandler) targeting 90% coverage",
+            "dependencies": [],
+            "details": "Install and configure Vitest with TypeScript support, create test directory structure, set up coverage reporting with 90% threshold, implement comprehensive unit tests for all core components including mocking of Chrome DevTools Protocol, create test utilities for common assertions and mock data generation",
+            "status": "done",
+            "testStrategy": "Unit tests with mocking of external dependencies, coverage reporting, and assertion helpers for consistent testing patterns",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement converter-specific unit tests and test fixtures",
+            "description": "Create comprehensive unit tests for all converter modules (PDF, Image, Markdown, DOCX, MHTML) and establish test fixtures including sample HTML files, golden output references, and mock data for various conversion scenarios",
+            "dependencies": [
+              1
+            ],
+            "details": "Build unit tests for each converter with input/output validation, create tests/fixtures/ directory with simple.html, complex.html, external-resources.html, single-page-layout.html, and large-document.html files, generate golden output references for each format, implement file comparison utilities for validating conversion outputs",
+            "status": "done",
+            "testStrategy": "Converter-specific unit tests with golden file comparison, input validation tests, and error scenario coverage",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build integration and end-to-end testing framework",
+            "description": "Implement integration tests for end-to-end conversion flows and E2E tests using real Chrome instances, including remote URL conversion, multi-format conversion chains, and error recovery scenarios",
+            "dependencies": [
+              2
+            ],
+            "details": "Create integration tests for complete conversion workflows, set up Playwright for E2E testing with real Chrome, implement tests for CLI commands with actual Chrome processes, create test HTTP server for remote URL testing, add cross-format conversion validation tests, implement error recovery and timeout scenario tests",
+            "status": "done",
+            "testStrategy": "Integration tests with real Chrome instances, E2E CLI testing, and network request mocking for remote URL scenarios",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement visual regression and performance testing",
+            "description": "Create visual regression testing framework for PDF and image outputs, implement performance benchmarking for conversion speed, memory usage, and concurrent operations with automated baseline comparison",
+            "dependencies": [
+              3
+            ],
+            "details": "Build custom visual regression comparison system for PDF snapshots and image outputs, create tests/visual/ directory with baseline images, implement performance benchmarks measuring conversion time, memory usage, and concurrent conversion handling, set up automated performance regression detection with configurable thresholds, create update workflows for visual baselines",
+            "status": "done",
+            "testStrategy": "Visual diff comparison for PDF/image outputs, performance benchmarking with regression detection, and memory usage monitoring",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Configure test matrix and CI/CD integration",
+            "description": "Set up comprehensive test matrix covering Node.js versions 18.x/20.x/22.x with Chrome versions 90-130 across Ubuntu/macOS/Windows platforms, integrate with CI/CD pipeline for automated testing, coverage reporting, and quality gates enforcement",
+            "dependencies": [
+              4
+            ],
+            "details": "Configure test matrix for multiple Node.js and Chrome version combinations, set up CI/CD workflows for automated test execution on pull requests, implement coverage reporting with minimum 90% threshold enforcement, create performance regression detection in CI, set up visual regression diff reporting, configure quality gates requiring all tests to pass before merge, add multi-platform test execution for Ubuntu, macOS, and Windows",
+            "status": "done",
+            "testStrategy": "Multi-platform CI/CD testing with coverage thresholds, performance regression detection, and quality gate enforcement",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-10-15T15:21:45.848Z"
+      },
+      {
+        "id": "11",
+        "title": "Implement Security Controls and Sandboxing",
+        "description": "Implement comprehensive security controls including Chrome sandbox enforcement, input sanitization, secure temp file handling, and input validation. Prevent path traversal attacks, block private IP access, ensure proper Chrome process isolation, and implement secure resource cleanup. Critical for production deployment safety.",
+        "details": "Based on FSD section 10 (Security Implementation):\n\n## Security Components:\n\n### 1. Chrome Sandbox Enforcement (Chrome Launch Flags)\n```typescript\nconst SECURE_CHROME_FLAGS = [\n  '--headless',\n  '--disable-gpu', \n  '--disable-dev-shm-usage',\n  '--disable-setuid-sandbox',  // Only in specific contexts\n  '--no-first-run',\n  '--no-default-browser-check',\n  '--disable-extensions',\n  '--disable-background-networking',\n  '--disable-sync',\n  '--disable-translate',\n  '--metrics-recording-only',\n  '--safebrowsing-disable-auto-update',\n  '--mute-audio'\n]\n\n// NEVER use in production:\n// '--no-sandbox'            // Disables security sandbox\n// '--remote-debugging-port' // Exposes debugging port\n```\n\n### 2. Input Sanitization (src/core/utils/validation.ts)\n- File path validation against path traversal attacks\n- URL validation for HTTP/HTTPS only\n- Private IP address blocking (configurable)\n- Input size and type validation\n- Option sanitization to prevent prototype pollution\n\n### 3. Secure Temp File Handling (src/core/engine/resource-manager.ts)\n- Temp directory creation with restricted permissions (0o700)\n- Owner-only read/write/execute permissions\n- Automatic cleanup of stale temp files\n- Secure file naming with random identifiers\n- Memory-mapped file handling when appropriate\n\n### 4. Chrome Process Isolation\n- User data directory isolation per conversion\n- Process-specific Chrome profiles\n- Network access restrictions\n- File system access limitations\n- Resource usage monitoring and limits\n\n## Security Features:\n\n### Input Validation:\n- File path resolution and validation\n- URL scheme validation (http/https only)\n- Domain validation against blacklist/whitelist\n- Input size limits to prevent DoS attacks\n- Character encoding validation\n\n### Path Traversal Prevention:\n- Disallow relative path components (../)\n- Validate absolute paths against allowed directories\n- File system permission checks\n- Symbolic link resolution and validation\n\n### Network Security:\n- HTTP/HTTPS protocol enforcement\n- Private IP address blocking (10.x, 172.16-31.x, 192.168.x)\n- Domain validation against malicious patterns\n- Request timeout and size limits\n- User-Agent header management\n\n### Process Security:\n- Chrome process sandboxing\n- Minimal Chrome runtime permissions\n- Resource usage monitoring\n- Memory leak prevention\n- Process cleanup on completion\n\n### File System Security:\n- Secure temp directory creation with 0o700 permissions\n- Atomic file operations where possible\n- Secure file deletion with data wiping\n- Temporary file lifecycle management\n- Access control enforcement\n\n## Security Configuration Options:\n\n### Environment Variables:\n- HTML_CONVERTER_ALLOW_PRIVATE_IPS (default: false)\n- HTML_CONVERTER_MAX_FILE_SIZE (default: 100MB)\n- HTML_CONVERTER_ALLOWED_DOMAINS (comma-separated)\n- HTML_CONVERTER_BLOCKED_DOMAINS (comma-separated)\n\n### Configuration File Options:\n- security.allowPrivateIPs (boolean)\n- security.maxFileSize (bytes)\n- security.allowedDomains (string[])\n- security.blockedDomains (string[])\n- security.enableSandbox (boolean)\n\n## Security Auditing:\n- Chrome launch flag validation\n- Input sanitization logging\n- File access pattern monitoring\n- Network request logging\n- Temp file cleanup verification\n\n## Error Handling:\n- Security-focused error messages (no information leakage)\n- Failed validation logging without exposing sensitive data\n- Graceful degradation for security violations\n- Security incident reporting\n\n## Integration Points:\n- Used by InputHandler for validation\n- Integrated with ResourceManager for secure file operations\n- Chrome launcher integration for sandbox enforcement\n- Configuration system for security settings\n- Error handling system for security violations",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "7"
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Chrome Sandbox Enforcement and Launch Flags",
+            "description": "Create secure Chrome launch configuration with proper sandbox flags and security controls to prevent Chrome process exploitation.",
+            "dependencies": [],
+            "details": "Implement SECURE_CHROME_FLAGS array with headless, disabled GPU, disabled dev-shm-usage, and other security flags. Create ChromeLauncher class in src/core/security/chrome-launcher.ts that validates and applies secure launch flags. Never allow --no-sandbox or --remote-debugging-port flags in production. Include flag validation and security auditing.",
+            "status": "done",
+            "testStrategy": "Unit tests for flag validation, integration tests with actual Chrome launch, security audit tests to ensure no dangerous flags are used",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Build Input Sanitization and Validation System",
+            "description": "Create comprehensive input validation system to prevent path traversal attacks, malicious URLs, and prototype pollution vulnerabilities.",
+            "dependencies": [],
+            "details": "Implement InputValidator class in src/core/utils/validation.ts with file path validation, URL scheme validation (HTTP/HTTPS only), private IP blocking, input size limits, and character encoding validation. Include path traversal prevention with relative path component detection and absolute path validation against allowed directories.",
+            "status": "done",
+            "testStrategy": "Unit tests for path traversal attempts, URL validation edge cases, private IP detection, and prototype pollution prevention",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Secure Temporary File Handling",
+            "description": "Build secure temporary file management system with restricted permissions, automatic cleanup, and secure naming to prevent file system attacks.",
+            "dependencies": [],
+            "details": "Create SecureTempManager class in src/core/engine/resource-manager.ts with temp directory creation using 0o700 permissions, owner-only access controls, random file naming, automatic cleanup of stale files, and secure file deletion with data wiping. Include memory-mapped file handling and atomic file operations.",
+            "status": "done",
+            "testStrategy": "Unit tests for file permissions, temp file lifecycle, cleanup verification, and atomic operation safety",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Create Chrome Process Isolation and Network Security",
+            "description": "Implement Chrome process isolation with user data directory separation and network access restrictions to prevent unauthorized access.",
+            "dependencies": [
+              1
+            ],
+            "details": "Build ProcessIsolationManager in src/core/security/process-isolation.ts with isolated user data directories per conversion, process-specific Chrome profiles, network access restrictions, file system limitations, and resource usage monitoring. Include private IP blocking (10.x, 172.16-31.x, 192.168.x ranges) and domain validation.",
+            "status": "done",
+            "testStrategy": "Integration tests for process isolation, network restriction verification, and resource monitoring accuracy",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Integrate Security Configuration and Auditing System",
+            "description": "Build configurable security system with environment variables, security auditing, and error handling that integrates all security components.",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "Create SecurityManager class in src/core/security/security-manager.ts that coordinates all security components. Implement environment variable configuration (HTML_CONVERTER_ALLOW_PRIVATE_IPS, HTML_CONVERTER_MAX_FILE_SIZE), security auditing with logging, and integration with InputHandler, ResourceManager, and Chrome launcher. Include security-focused error handling without information leakage.",
+            "status": "done",
+            "testStrategy": "Integration tests for complete security workflow, configuration validation tests, and security audit log verification",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "12",
+        "title": "Implement Full-Featured CLI with Progress Indicators",
+        "description": "Build comprehensive CLI using Commander.js with progress indicators (ora), colored output (chalk), and extensive option parsing. Support all conversion formats, dry-run mode, verbose logging, stdin/stdout handling, and proper error handling with user-friendly messages. Include format-specific CLI options and help system.",
+        "details": "Based on FSD section 12 (CLI Implementation):\n\n## CLI Components:\n\n### 1. CLI Entry Point (src/cli/index.ts)\n- Commander.js program setup\n- Version display and help system\n- Global argument parsing (input, output)\n- Command routing and delegation\n- Error handling and exit codes\n\n### 2. Convert Command (src/cli/commands/convert.ts)\n- Main conversion command implementation\n- Progress indication with ora spinners\n- Colored output with chalk\n- Format detection from file extensions\n- Option building and validation\n- Error handling with user-friendly messages\n\n### 3. CLI Options (src/cli/options.ts)\n- Comprehensive CLI option definitions\n- Format-specific option parsing\n- Default value management\n- Option validation and type conversion\n- Help text generation\n\n### 4. Output Formatting (src/cli/output.ts)\n- Progress spinner management\n- Colored console output\n- File size formatting\n- Metadata display formatting\n- Error message styling\n\n### 5. Stdin/Stdout Handlers (src/cli/stdin-handler.ts, src/cli/stdout-handler.ts)\n- stdin processing for HTML input\n- stdout piping for binary output\n- Buffer management for large files\n- Stream handling for continuous processing\n\n## CLI Arguments and Options:\n\n### Basic Arguments:\n- `<input>`: Input HTML file, URL, or \"-\" for stdin\n- `[output]`: Output file (format inferred from extension)\n\n### Global Options:\n- `-f, --format <format>`: Output format (pdf, png, jpeg, md, docx, mhtml)\n- `--stdout`: Output to stdout instead of file\n- `--dry-run`: Show configuration without converting\n- `-v, --verbose`: Enable verbose logging\n- `--keep-mhtml`: Keep intermediate MHTML file\n- `--mhtml-path <path>`: Custom path for MHTML file\n- `--max-retries <n>`: Maximum retry attempts (default: 3)\n- `--timeout <ms>`: Timeout in milliseconds (default: 30000)\n\n### PDF-Specific Options:\n- `--layout <mode>`: Layout mode (standard, single-page)\n- `--page-size <size>`: Page size (A4, Letter, etc.)\n- `--margin <value>`: Margin (e.g., 20px, 1cm)\n- `--scale <factor>`: Scale factor (e.g., 0.9)\n- `--no-background`: Disable background graphics\n- `--header-template <template>`: Custom header template\n- `--footer-template <template>`: Custom footer template\n\n### Image-Specific Options:\n- `--quality <n>`: Image quality (1-100)\n- `--viewport <WxH>`: Viewport size (e.g., 1920x1080)\n- `--omit-background`: Omit background (PNG only)\n- `--clip <x,y,width,height>`: Clip region\n\n### Markdown-Specific Options:\n- `--flavor <type>`: Markdown flavor (gfm, commonmark)\n- `--no-embed-images`: Don't embed images as base64\n- `--image-asset-path <path>`: Directory for saved images\n\n### DOCX-Specific Options:\n- `--preserve-style`: Preserve HTML styling\n- `--font-family <font>`: Default font family\n- `--font-size <size>`: Default font size in points\n\n## CLI Features:\n\n### Progress Indication:\n- Conversion progress spinners\n- Stage-specific progress updates\n- Completion status with timing\n- Error state indication\n\n### User Experience:\n- Colored output for better readability\n- Clear error messages with suggestions\n- Verbose mode for debugging\n- Dry-run mode for configuration preview\n\n### File Handling:\n- Automatic format detection from file extensions\n- stdin support for piped input\n- stdout support for piped output\n- Proper file permissions handling\n\n### Error Handling:\n- Graceful error recovery\n- User-friendly error messages\n- Verbose error details when requested\n- Proper exit codes\n\n## CLI Help System:\n- Comprehensive help text generation\n- Usage examples\n- Format-specific option documentation\n- Troubleshooting guidance\n\n## Integration Points:\n- Uses ConversionEngine for all operations\n- Integration with Configuration System\n- Error handling system integration\n- Progress reporting from conversion pipeline\n- Security validation through input handlers",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "8"
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create CLI entry point with Commander.js setup",
+            "description": "Implement main CLI entry point using Commander.js with program setup, version display, global argument parsing, and command routing. Add necessary dependencies including commander, ora, and chalk.",
+            "dependencies": [],
+            "details": "Create src/cli/index.ts with Commander.js program configuration. Set up version from package.json, global options parsing (input/output), command routing to convert command, and proper error handling with exit codes. Install required dependencies: commander for CLI framework, ora for progress spinners, chalk for colored output. Configure TypeScript compilation for CLI entry point.",
+            "status": "done",
+            "testStrategy": "Unit tests for CLI option parsing, command routing, and error handling scenarios",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement convert command with progress indicators",
+            "description": "Build main convert command implementation with ora spinners for progress indication, chalk for colored output, format detection from file extensions, and comprehensive option handling.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/cli/commands/convert.ts implementing the main conversion command. Use ora spinners to show progress during conversion stages, chalk for colored success/error messages, automatic format detection from output file extensions, validation of input/output parameters, and integration with conversion engine. Handle dry-run mode, verbose logging, and proper error display with user-friendly messages.",
+            "status": "done",
+            "testStrategy": "Integration tests for convert command with mock conversion engine, progress indicator testing, and format detection validation",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Create comprehensive CLI options system",
+            "description": "Implement CLI options parser with format-specific options, validation, type conversion, and help text generation. Support all conversion formats with their specific configuration options.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/cli/options.ts with comprehensive option definitions for all formats (PDF, image, markdown, DOCX, MHTML). Implement option parsing with type conversion, default value management, validation rules, and format-specific option grouping. Generate help text for each option group and provide examples. Include global options like verbose, dry-run, timeout, and format-specific options like PDF page size, image quality, viewport settings.",
+            "status": "done",
+            "testStrategy": "Unit tests for option parsing, validation, type conversion, and help text generation",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement output formatting and display utilities",
+            "description": "Create output formatting utilities for progress management, colored console output, file size formatting, metadata display, and error message styling using chalk and ora.",
+            "dependencies": [
+              2
+            ],
+            "details": "Create src/cli/output.ts with progress spinner management using ora, colored console output with chalk for different message types (success, error, warning, info), file size formatting utilities, metadata display formatting for conversion results, and consistent error message styling. Implement verbose mode output with detailed conversion information and timing data.",
+            "status": "done",
+            "testStrategy": "Unit tests for output formatting functions, spinner management, and colored output generation",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create stdin/stdout handlers for stream processing",
+            "description": "Implement stdin and stdout handlers for reading HTML from pipes and outputting binary data to stdout, supporting continuous stream processing and buffer management.",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Create src/cli/stdin-handler.ts and src/cli/stdout-handler.ts for stream processing. Implement stdin reading for HTML input with proper encoding handling, stdout writing for binary output (PDF, images) with proper buffer management, stream handling for large files, and integration with the conversion pipeline. Support piped input/output scenarios and proper error handling for stream operations.",
+            "status": "done",
+            "testStrategy": "Integration tests for stdin/stdout processing with mock streams, buffer management testing, and stream error handling",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "13",
+        "title": "Implement Public API Specifications",
+        "description": "Build comprehensive public API with both format-specific functions (convertToX) and unified convert() function. Provide clean TypeScript interfaces, comprehensive type exports, proper error handling, and integration with conversion engine. Include format-specific option types and result interfaces with metadata.",
+        "details": "Based on FSD section 13 (API Specifications):\n\n## API Components:\n\n### 1. Main API Export (src/index.ts)\n- Format-specific function exports\n- Unified convert() function export\n- Type exports for TypeScript users\n- Error class exports\n- Configuration system exports\n- Clean import structure for tree-shaking\n\n### 2. Format-Specific API (src/api/format-specific.ts)\n- convertToMHTML(input, options)\n- convertToPDF(input, options)\n- convertToPNG(input, options)\n- convertToJPEG(input, options)\n- convertToMarkdown(input, options)\n- convertToDOCX(input, options)\n\n### 3. Unified API (src/api/convert.ts)\n- Unified convert(input, options) function\n- Format detection from output file extension\n- Configuration merging and validation\n- Error handling and propagation\n\n## API Functions:\n\n### Format-Specific Functions:\n```typescript\n// PDF Conversion\nexport async function convertToPDF(\n  input: string,\n  options?: PDFOptions\n): Promise<ConversionResult>\n\n// Image Conversions  \nexport async function convertToPNG(\n  input: string,\n  options?: ImageOptions\n): Promise<ConversionResult>\n\nexport async function convertToJPEG(\n  input: string,\n  options?: ImageOptions\n): Promise<ConversionResult>\n\n// Markdown Conversion\nexport async function convertToMarkdown(\n  input: string,\n  options?: MarkdownOptions\n): Promise<ConversionResult>\n\n// DOCX Conversion\nexport async function convertToDOCX(\n  input: string,\n  options?: DOCXOptions\n): Promise<ConversionResult>\n\n// MHTML Conversion\nexport async function convertToMHTML(\n  input: string,\n  options?: MHTMLOptions\n): Promise<ConversionResult>\n```\n\n### Unified Function:\n```typescript\nexport async function convert(\n  input: string,\n  options: ConversionOptions & { format: string }\n): Promise<ConversionResult>\n```\n\n## Type Definitions:\n\n### Conversion Options:\n```typescript\nexport interface ConversionOptions {\n  // General options\n  output?: string\n  keepMHTML?: boolean\n  mhtmlPath?: string\n  maxRetries?: number\n  timeout?: number\n  verbose?: boolean\n  logger?: Logger\n  \n  // Format-specific options (union type)\n  pdfOptions?: PDFOptions\n  imageOptions?: ImageOptions\n  markdownOptions?: MarkdownOptions\n  docxOptions?: DOCXOptions\n  mhtmlOptions?: MHTMLOptions\n}\n```\n\n### Format-Specific Options:\n```typescript\nexport interface PDFOptions {\n  layout?: 'standard' | 'single-page'\n  pageSize?: PageSize | string | { width: string; height: string }\n  margin?: Margin | string\n  scale?: number\n  printBackground?: boolean\n  displayHeaderFooter?: boolean\n  headerTemplate?: string\n  footerTemplate?: string\n  preferCSSPageSize?: boolean\n}\n\nexport interface ImageOptions {\n  quality?: number\n  layout?: 'standard' | 'single-page'\n  viewport?: { width: number; height: number }\n  clip?: { x: number; y: number; width: number; height: number }\n  omitBackground?: boolean\n}\n\n// ... more format-specific option interfaces\n```\n\n### Conversion Result:\n```typescript\nexport interface ConversionResult {\n  buffer?: Buffer\n  filePath?: string\n  mhtmlPath?: string\n  metadata: ConversionMetadata\n}\n\nexport interface ConversionMetadata {\n  format: string\n  sourceType: 'local' | 'remote' | 'string' | 'stdin'\n  sourceUrl?: string\n  duration?: number\n  fileSize?: number\n  pageCount?: number\n  dimensions?: { width: number; height: number }\n  wordCount?: number\n  lineCount?: number\n  imageCount?: number\n  [key: string]: any\n}\n```\n\n## API Features:\n\n### Type Safety:\n- Comprehensive TypeScript definitions\n- Strict type checking for options\n- Generic type parameters where appropriate\n- Type guards for runtime validation\n\n### Error Handling:\n- Structured error propagation\n- Type-safe error codes\n- ConversionError exports\n- Detailed error context\n\n### Convenience Features:\n- Automatic format detection from output file extension\n- Default option management\n- Configuration system integration\n- Promise-based async interface\n\n### Performance:\n- Tree-shaking support for minimal bundles\n- Efficient option validation\n- Streamlined error paths\n- Memory-conscious buffer handling\n\n## Usage Examples:\n\n### Format-Specific Usage:\n```typescript\nimport { convertToPDF, convertToPNG } from 'html-converter-cdt'\n\n// PDF conversion\nconst pdfResult = await convertToPDF('input.html', {\n  pageSize: 'A4',\n  margin: '20px'\n})\n\n// PNG conversion  \nconst pngResult = await convertToPNG('input.html', {\n  quality: 90,\n  fullPage: true\n})\n```\n\n### Unified Usage:\n```typescript\nimport { convert } from 'html-converter-cdt'\n\nconst result = await convert('input.html', {\n  format: 'pdf',\n  output: 'output.pdf',\n  pageSize: 'A4'\n})\n```\n\n## Integration Points:\n- Direct integration with ConversionEngine\n- Configuration system for default options\n- Error handling system for error propagation\n- Type system integration with converters\n- Logger integration for debugging\n\n## Documentation:\n- Comprehensive JSDoc comments\n- Usage examples in README\n- API reference documentation\n- TypeScript definition file generation",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "2"
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Analyze existing API structure and types",
+            "description": "Explore the current codebase to understand existing API patterns, type definitions, and conversion engine integration points.",
+            "dependencies": [],
+            "details": "Use Glob to find existing API files, Grep to search for type definitions and conversion functions, and Read key files to understand current architecture and patterns before implementing new API specifications.",
+            "status": "done",
+            "testStrategy": "Verify existing type exports and API structure analysis",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Create comprehensive TypeScript type definitions",
+            "description": "Define all required TypeScript interfaces for conversion options, format-specific options, conversion results, and metadata structures.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement ConversionOptions, PDFOptions, ImageOptions, MarkdownOptions, DOCXOptions, MHTMLOptions, ConversionResult, and ConversionMetadata interfaces in src/types/ directory with proper JSDoc documentation.",
+            "status": "done",
+            "testStrategy": "Type validation tests ensuring all interfaces compile without errors",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement format-specific API functions",
+            "description": "Create convertToMHTML, convertToPDF, convertToPNG, convertToJPEG, convertToMarkdown, and convertToDOCX functions with proper error handling and option validation.",
+            "dependencies": [
+              2
+            ],
+            "details": "Build src/api/format-specific.ts with all format-specific conversion functions, each integrating with the conversion engine, validating options, and returning structured ConversionResult objects.",
+            "status": "done",
+            "testStrategy": "Unit tests for each format-specific function covering normal cases, error cases, and option validation",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement unified convert() function",
+            "description": "Create the unified convert() function with automatic format detection, configuration merging, and comprehensive error handling.",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Build src/api/convert.ts with unified conversion function that detects format from output file extension, merges options appropriately, and delegates to format-specific functions.",
+            "status": "done",
+            "testStrategy": "Integration tests covering format detection, option merging, and delegation to format-specific functions",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create main API export structure and integrate with conversion engine",
+            "description": "Build src/index.ts with clean exports for all functions, types, and error classes, and ensure proper integration with the conversion engine.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Implement main index.ts with structured exports for tree-shaking, integrate all API functions with the conversion engine, export error classes and configuration system, and verify all TypeScript compilation passes.",
+            "status": "done",
+            "testStrategy": "End-to-end tests verifying all exports work correctly and integrate properly with conversion engine",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "14",
+        "title": "Implement Performance Optimization and Async Processing",
+        "description": "Build performance optimization system with async resource pipelines for streaming large files, concurrent conversion support with configurable batch sizes, and memory management strategies. Include streaming MHTML processing, batch conversion capabilities, and memory leak prevention techniques for efficient handling of large documents.",
+        "details": "Based on FSD section 11 (Performance Optimization):\n\n## Performance Components:\n\n### 1. Async Resource Pipeline (Future Enhancement)\n- Streaming MHTML processor for large files\n- Incremental resource fetching and processing\n- Memory-efficient file streaming\n- Backpressure handling for slow resources\n- Cancellation support for long operations\n\n### 2. Batch Converter (src/core/engine/batch-converter.ts)\n- Concurrent conversion support\n- Configurable batch sizes and concurrency limits\n- Resource pool management\n- Progress tracking for batch operations\n- Error isolation in batch processing\n\n### 3. Memory Management Strategies\n- Stream large files instead of loading into memory\n- Immediate cleanup after each conversion\n- Concurrent conversion limits to prevent memory exhaustion\n- WeakMap usage for caches\n- Heap usage monitoring and GC triggering\n\n## Performance Features:\n\n### Streaming Architecture:\n```typescript\nexport class StreamingMHTMLProcessor {\n  async generateStream(\n    input: ParsedInput,\n    context: ConversionContext\n  ): Promise<Readable> {\n    // Create readable stream\n    const stream = new Readable({\n      async read() {\n        // Fetch and stream resources incrementally\n      }\n    })\n    return stream\n  }\n}\n```\n\n### Batch Processing:\n```typescript\nexport class BatchConverter {\n  async convertBatch(\n    inputs: string[],\n    format: string,\n    options: ConversionOptions\n  ): Promise<ConversionResult[]> {\n    const concurrency = options.concurrency || 5\n    const results: ConversionResult[] = []\n    \n    for (let i = 0; i < inputs.length; i += concurrency) {\n      const batch = inputs.slice(i, i + concurrency)\n      const batchResults = await Promise.all(\n        batch.map(input => convert(input, { format, ...options }))\n      )\n      results.push(...batchResults)\n    }\n    \n    return results\n  }\n}\n```\n\n### Memory Management:\n- Resource pool management for Chrome instances\n- Automatic garbage collection triggering\n- Memory usage monitoring and alerts\n- Streaming file processing for large inputs\n- Efficient buffer management\n\n## Performance Metrics:\n\n### Conversion Speed:\n- Small HTML (<100KB): Target <2 seconds\n- Medium HTML (100KB-1MB): Target <5 seconds  \n- Large HTML (>1MB): Target <15 seconds\n- Concurrent processing: Scale linearly with available cores\n\n### Memory Usage:\n- Peak memory usage < 500MB for single conversion\n- Batch processing memory scaling: ~50MB per concurrent conversion\n- Memory leak prevention with automatic cleanup\n- Heap monitoring with alerts at 80% usage\n\n### Concurrency:\n- Default concurrent conversions: 5\n- Maximum concurrent conversions: 10 (configurable)\n- Chrome instance pooling for reuse\n- Resource cleanup between conversions\n\n## Optimization Strategies:\n\n### Chrome Process Management:\n- Chrome instance reuse for multiple conversions\n- User data directory isolation\n- Process lifecycle optimization\n- Connection pooling for CDP clients\n\n### File Processing:\n- Streaming reads for large HTML files\n- Incremental MHTML generation\n- Buffered writes for output files\n- Temporary file lifecycle management\n\n### Resource Optimization:\n- Connection reuse for multiple operations\n- Asset caching where appropriate\n- Lazy loading of optional features\n- Efficient data structures for large content\n\n### Network Optimization:\n- Connection pooling for remote resources\n- Request timeout optimization\n- Retry logic with exponential backoff\n- Parallel resource fetching\n\n## Configuration Options:\n\n### Performance Settings:\n- `concurrency`: Number of concurrent conversions\n- `memoryLimit`: Maximum memory usage threshold\n- `streamingThreshold`: File size threshold for streaming\n- `cacheSize`: Resource cache size limit\n- `batchSize`: Default batch processing size\n\n### Resource Limits:\n- `maxFileSize`: Maximum input file size\n- `maxConcurrentConversions`: Maximum concurrent operations\n- `maxMemoryUsage`: Memory usage alert threshold\n- `chromeInstances`: Chrome instance pool size\n\n## Monitoring and Metrics:\n\n### Performance Tracking:\n- Conversion timing metrics\n- Memory usage monitoring\n- Chrome instance utilization\n- Resource cleanup verification\n- Error rate tracking\n\n### Alerting:\n- Memory usage alerts\n- Performance degradation warnings\n- Resource exhaustion notifications\n- Error spike detection\n\n## Integration Points:\n- Used by ConversionEngine for optimization decisions\n- Integration with Configuration System for performance settings\n- Resource Manager integration for memory management\n- Error handling system for performance-related errors\n- Testing framework integration for performance benchmarks\n\n## Future Enhancements:\n- Full streaming implementation for large files\n- Adaptive concurrency based on system resources\n- Smart caching strategies for repeated conversions\n- Predictive performance optimization based on content analysis",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "2"
+        ],
+        "priority": "low",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Memory Management Utilities",
+            "description": "Implement core memory management utilities for monitoring and controlling memory usage during conversions",
+            "dependencies": [],
+            "details": "Create src/core/performance/memory-manager.ts with memory monitoring, heap usage tracking, garbage collection triggering, and memory usage alerts. Include functions for monitoring memory usage, triggering GC, checking memory limits, and managing buffer sizes for Chrome extension environment.",
+            "status": "done",
+            "testStrategy": "Unit tests for memory monitoring functions, GC triggering, buffer size validation, and memory limit checking",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Batch Converter Class",
+            "description": "Build batch conversion system with configurable concurrency limits and progress tracking",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/core/engine/batch-converter.ts implementing BatchConverter class with convertBatch method, concurrency management, resource pool handling, and error isolation. Include progress tracking for batch operations and configurable batch sizes.",
+            "status": "done",
+            "testStrategy": "Integration tests for batch processing with different concurrency levels, error isolation, and progress tracking",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Create Streaming MHTML Processor",
+            "description": "Implement streaming processor for large MHTML files with incremental resource fetching",
+            "dependencies": [
+              1
+            ],
+            "details": "Create src/core/performance/streaming-mhtml-processor.ts with StreamingMHTMLProcessor class that can generate readable streams, handle incremental resource fetching, implement backpressure handling, and support cancellation for long operations.",
+            "status": "done",
+            "testStrategy": "Unit tests for stream generation, backpressure handling, and cancellation functionality; integration tests with large files",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Chrome Instance Pool Manager",
+            "description": "Create Chrome process pool for reusing instances across multiple conversions",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create src/core/performance/chrome-pool.ts implementing ChromeInstancePool class with connection pooling, instance lifecycle management, user data directory isolation, and automatic cleanup. Integrate with existing CDP adapters.",
+            "status": "done",
+            "testStrategy": "Integration tests for Chrome instance reuse, pool management, connection lifecycle, and cleanup verification",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Add Performance Configuration and Monitoring",
+            "description": "Implement performance settings configuration and metrics tracking system",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Extend configuration system with performance settings (concurrency, memory limits, streaming thresholds), create performance metrics tracking for conversion timing, memory usage, and Chrome utilization. Add alerting for performance degradation and resource exhaustion.",
+            "status": "done",
+            "testStrategy": "Unit tests for configuration validation, metrics collection, and alerting system; performance benchmark tests",
+            "parentId": "undefined"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2025-10-15T15:21:45.849Z",
+      "taskCount": 14,
+      "completedCount": 13,
+      "tags": [
+        "master"
+      ]
+    }
+  }
+}

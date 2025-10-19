@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "HTML Converter CDT",
+  "version": "1.0.0",
+  "description": "Browser extension for HTML conversion using Chrome DevTools Protocol",
+  "permissions": [
+    "debugger",
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "HTML Converter"
+  }
+}

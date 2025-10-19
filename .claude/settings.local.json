@@ -1,0 +1,72 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__task-master-ai__get_tasks",
+      "mcp__task-master-ai__parse_prd",
+      "mcp__task-master-ai__add_task",
+      "mcp__task-master-ai__get_task",
+      "mcp__task-master-ai__set_task_status",
+      "mcp__task-master-ai__update_subtask",
+      "mcp__task-master-ai__next_task",
+      "Bash(task-master:*)",
+      "mcp__Deep_Graph_MCP__folder-tree-structure",
+      "Bash(printf:*)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm test)",
+      "Bash(pnpm eslint:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx vitest run:*)",
+      "Bash(node:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx jest:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git diff:*)",
+      "Bash(git bisect:*)",
+      "Bash(git grep:*)",
+      "Bash(git status:*)",
+      "Bash(chmod:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(tree:*)",
+      "Bash(npx tsup:*)",
+      "Bash(Run eslint on specific file to see exact errors)",
+      "Bash(find:*)",
+      "Bash(timeout:*)",
+      "Bash(awk:*)",
+      "Bash(tee:*)",
+      "Read(///**)",
+      "Bash(python3:*)",
+      "Bash(npx tsx:*)",
+      "Bash(tsx:*)",
+      "Bash(gtimeout:*)",
+      "Bash(NODE_ENV=test pnpm test:*)",
+      "Bash(NODE_ENV=development pnpm test:*)",
+      "Bash(grep -n \"^\\`\\`\\`\" /Users/robin/projects/html-converter-cdt/docs/fsd-v2.md)",
+      "Bash(cat /Users/robin/projects/html-converter-cdt/node_modules/.pnpm/@ilyasemenov+eslint-config@1.4.2_eslint@8.57.1/node_modules/@ilyasemenov/eslint-config/index.js)"
+    ],
+    "deny": [
+      "Bash(git commit:*)",
+      "Bash(git fetch:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git branch:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git reset:*)",
+      "Bash(git add:*)",
+      "Bash(git mv:*)",
+      "Bash(git restore:*)",
+      "Bash(git rm:*)"
+    ],
+    "ask": [
+      "Bash(git checkout:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "task-master-ai"
+  ]
+}

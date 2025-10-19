@@ -1,0 +1,32 @@
+From: <saved@localhost>
+Subject: HTML Document
+Date: Fri, 17 Oct 2025 04:55:40 GMT
+MIME-Version: 1.0
+Content-Type: multipart/related; boundary="----=_NextPart_1760676940382_7hfp46v3ywj"
+
+------=_NextPart_1760676940382_7hfp46v3ywj
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: index.html
+
+<!DOCTYPE html>
+<html lang=3D"en">
+<head>
+    <meta charset=3D"UTF-8">
+    <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=
+=3D1.0">
+    <title>Simple HTML Document</title>
+</head>
+<body>
+    <h1>Simple Test Document</h1>
+    <p>This is a simple HTML document for testing purposes.</p>
+    <p>It contains basic HTML elements like headings and paragraphs.</p>
+    <ul>
+        <li>First item</li>
+        <li>Second item</li>
+        <li>Third item</li>
+    </ul>
+</body>
+</html>
+
+------=_NextPart_1760676940382_7hfp46v3ywj--
