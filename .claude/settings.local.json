@@ -45,7 +45,8 @@
       "Bash(NODE_ENV=test pnpm test:*)",
       "Bash(NODE_ENV=development pnpm test:*)",
       "Bash(grep -n \"^\\`\\`\\`\" /Users/robin/projects/html-converter-cdt/docs/fsd-v2.md)",
-      "Bash(cat /Users/robin/projects/html-converter-cdt/node_modules/.pnpm/@ilyasemenov+eslint-config@1.4.2_eslint@8.57.1/node_modules/@ilyasemenov/eslint-config/index.js)"
+      "Bash(cat /Users/robin/projects/html-converter-cdt/node_modules/.pnpm/@ilyasemenov+eslint-config@1.4.2_eslint@8.57.1/node_modules/@ilyasemenov/eslint-config/index.js)",
+      "Bash(npm view:*)"
     ],
     "deny": [
       "Bash(git commit:*)",
@@ -61,12 +62,8 @@
       "Bash(git restore:*)",
       "Bash(git rm:*)"
     ],
-    "ask": [
-      "Bash(git checkout:*)"
-    ]
+    "ask": ["Bash(git checkout:*)"]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "task-master-ai"
-  ]
+  "enabledMcpjsonServers": ["task-master-ai"]
 }
