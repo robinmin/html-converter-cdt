@@ -245,7 +245,7 @@ export class ConfigLoader {
     const cwd = workingDirectory ? resolve(workingDirectory) : process.cwd()
 
     // Add custom search paths
-    if (this.options.discovery.searchPaths.length > 0) {
+    if (this.options.discovery?.searchPaths && this.options.discovery.searchPaths.length > 0) {
       paths.push(...this.options.discovery.searchPaths.map(path => resolve(cwd, path)))
     }
 
@@ -253,11 +253,11 @@ export class ConfigLoader {
     paths.push(cwd)
 
     // Add parent directories up to max depth
-    if (this.options.discovery.searchProjectRoot) {
+    if (this.options.discovery?.searchProjectRoot) {
       let currentDir = cwd
       let depth = 0
 
-      while (depth < this.options.discovery.maxDepth) {
+      while (depth < (this.options.discovery?.maxDepth ?? 10)) {
         const parentDir = dirname(currentDir)
         if (parentDir === currentDir) {
           break
@@ -296,7 +296,7 @@ export class ConfigLoader {
         const filePath = join(directory, fileName)
 
         // Check if file matches any of our config file names
-        const configFileName = this.options.discovery.configFileNames.find(name =>
+        const configFileName = this.options.discovery?.configFileNames?.find(name =>
           fileName === name || fileName.startsWith(name + "."),
         )
 

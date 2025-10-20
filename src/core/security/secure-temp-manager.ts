@@ -276,7 +276,7 @@ export class SecureTempManager {
         riskAssessment: metadata.riskLevel,
         metadata: {
           mode: mode.toString(8),
-          encrypted,
+          encrypted: encrypt,
           atomic,
           secureDelete,
           maxSize,
@@ -285,7 +285,7 @@ export class SecureTempManager {
 
       this.logger.info(`Secure temporary file created: ${filePath}`, {
         mode: mode.toString(8),
-        encrypted,
+        encrypted: encrypt,
         atomic,
         riskLevel: metadata.riskLevel,
       })
@@ -633,13 +633,13 @@ export class SecureTempManager {
         // Force write to disk
         const fs = await import("node:fs")
         await new Promise<void>((resolve, reject) => {
-          fs.fsync?.open?.(filePath, "r+", (err: any, fd: any) => {
+          fs.open(filePath, "r+", (err: any, fd: any) => {
             if (err) {
               reject(err)
               return
             }
-            fs.fsync?.fd?.(fd, (syncErr: any) => {
-              fs.close?.fd?.(fd)
+            fs.fsync(fd, (syncErr: any) => {
+              fs.close(fd)
               if (syncErr) {
                 reject(syncErr)
               } else {
@@ -1000,7 +1000,9 @@ export class SecureTempManager {
     let totalFileSize = 0
     for (const metadata of this.tempFiles.values()) {
       totalFileSize += metadata.size
-      riskDistribution[metadata.riskLevel]++
+      if (metadata.riskLevel && metadata.riskLevel in riskDistribution) {
+        riskDistribution[metadata.riskLevel]!++
+      }
     }
 
     return {

@@ -287,8 +287,8 @@ export class StreamingMHTMLProcessor {
         stream.push(null)
       }
     } catch (error) {
-      this.logger.error("Error generating MHTML chunk", error)
-      stream.destroy(error as Error)
+      this.logger.error("Error generating MHTML chunk", error instanceof Error ? error : new Error(String(error)))
+      stream.destroy(error instanceof Error ? error : new Error(String(error)))
     }
   }
 
@@ -313,9 +313,9 @@ export class StreamingMHTMLProcessor {
     const phase = this.getCurrentProcessingPhase(elapsed)
 
     switch (phase) {
-      case "html":
+      case "parsing":
         return this.generateHTMLContentChunk(input, context)
-      case "resources":
+      case "fetching":
         return await this.generateResourceChunk(input, context)
       case "completed":
         return null // Signal end of stream
@@ -596,7 +596,7 @@ export class StreamingMHTMLProcessor {
    */
   private getFileExtension(url: string): string {
     const match = url.match(/\.([^.?#]+)(?:[?#]|$)/)
-    return match ? match[1].toLowerCase() : ""
+    return match?.[1]?.toLowerCase() ?? ""
   }
 
   /**
@@ -617,7 +617,7 @@ export class StreamingMHTMLProcessor {
     const sample = Math.min(content.length, 1000)
 
     for (let i = 0; i < sample; i++) {
-      const byte = content[i]
+      const byte = content[i]!
       if ((byte >= 32 && byte <= 126) || byte === 9 || byte === 10 || byte === 13) {
         printableCount++
       }
@@ -629,13 +629,13 @@ export class StreamingMHTMLProcessor {
   /**
    * Get current processing phase based on elapsed time
    */
-  private getCurrentProcessingPhase(elapsed: number): "headers" | "html" | "resources" | "completed" {
+  private getCurrentProcessingPhase(elapsed: number): "parsing" | "fetching" | "processing" | "completed" {
     // Simple time-based phase determination
     if (elapsed < 100) {
-      return "html"
+      return "parsing"
     }
     if (elapsed < 10000) {
-      return "resources"
+      return "fetching"
     }
     return "completed"
   }

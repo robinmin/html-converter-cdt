@@ -360,7 +360,9 @@ export class PerformanceMonitor {
       : 0
 
     // Calculate processing rate
-    const timeSpan = (Date.now() - this.metricsHistory[0].timestamp.getTime()) / 1000
+    const timeSpan = this.metricsHistory.length > 0
+      ? (Date.now() - this.metricsHistory[0]!.timestamp.getTime()) / 1000
+      : 0
     const processingRate = timeSpan > 0 ? this.metricsHistory.length / timeSpan : 0
 
     // Calculate performance trend

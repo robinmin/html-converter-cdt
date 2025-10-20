@@ -1,1 +1,35 @@
-pnpx lint-staged
+# Pre-commit validation - ensures ALL committed code meets quality standards
+# This is the ONLY gate before code enters git history
+echo "🔍 Running pre-commit validation..."
+
+# 1. TypeScript type checking on ENTIRE codebase (not just staged files)
+#    This ensures we don't commit code that breaks the overall type system
+echo "📘 Checking TypeScript types..."
+pnpm exec tsc --noEmit || {
+  echo "❌ TypeScript type check failed! Please fix type errors before committing."
+  exit 1
+}
+
+# 2. Run ESLint with auto-fix on staged files
+#    This catches code quality issues and auto-fixes when possible
+echo "🧹 Running linter on staged files..."
+pnpx lint-staged || {
+  echo "❌ Linting failed! Please fix linting errors before committing."
+  exit 1
+}
+
+# 3. Verify build works (ensures code compiles)
+echo "🔨 Verifying build..."
+pnpm build || {
+  echo "❌ Build failed! Please fix build errors before committing."
+  exit 1
+}
+
+# 4. Run unit tests (ensures functionality works)
+echo "🧪 Running unit tests..."
+pnpm test:unit || {
+  echo "❌ Unit tests failed! Please fix failing tests before committing."
+  exit 1
+}
+
+echo "✅ All pre-commit checks passed! Safe to commit."

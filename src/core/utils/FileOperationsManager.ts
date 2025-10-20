@@ -7,6 +7,7 @@
 
 import { Buffer } from "node:buffer"
 import { join, parse } from "node:path"
+import type { Readable, Writable } from "node:stream"
 
 import type { Logger } from "../../architecture/strategies/types.js"
 
@@ -332,10 +333,7 @@ export class FileOperationsManager {
             this.updateProgress(operationId, {
               operation: "Processing batch",
               bytesProcessed: result.totalBytesProcessed,
-              totalBytes: inputPaths.reduce((sum, path) => {
-                const info = this.secureFileManager.getFileInfo(path)
-                return sum + (info.size || 0)
-              }, 0),
+              totalBytes: 0, // Total bytes calculation would require async operations
               percentage: (processedFiles / inputPaths.length) * 100,
             })
 
@@ -496,8 +494,8 @@ export class FileOperationsManager {
    * Stream data between files or streams
    */
   async streamData(
-    source: string | NodeJS.ReadableStream,
-    destination: string | NodeJS.WritableStream,
+    source: string | Readable,
+    destination: string | Writable,
     options?: StreamingOptions & {
       maxSize?: number
       createDir?: boolean

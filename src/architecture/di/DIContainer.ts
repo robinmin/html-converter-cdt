@@ -16,21 +16,30 @@ import {
  */
 export class DIContainer {
   private services = new Map<string, ServiceDescriptor>()
-  private config: Required<DIContainerConfig>
+  private config: Required<DIContainerConfig> & {
+    errorMessages: Required<NonNullable<DIContainerConfig["errorMessages"]>>
+  }
+
   private resolutionDepth = 0
 
   constructor(config: DIContainerConfig = {}) {
+    const defaultMessages = {
+      serviceNotRegistered: "Service '{token}' is not registered",
+      circularDependency: "Circular dependency detected: {chain}",
+      maxDepthExceeded: "Maximum resolution depth ({maxDepth}) exceeded while resolving '{token}'",
+      invalidFactory: "Service factory for '{token}' returned undefined or null",
+    }
+
     this.config = {
-      enableCircularDependencyDetection: true,
-      maxResolutionDepth: 50,
-      enableAutoWiring: false,
+      enableCircularDependencyDetection: config.enableCircularDependencyDetection ?? true,
+      maxResolutionDepth: config.maxResolutionDepth ?? 50,
+      enableAutoWiring: config.enableAutoWiring ?? false,
       errorMessages: {
-        serviceNotRegistered: "Service '{token}' is not registered",
-        circularDependency: "Circular dependency detected: {chain}",
-        maxDepthExceeded: "Maximum resolution depth ({maxDepth}) exceeded while resolving '{token}'",
-        invalidFactory: "Service factory for '{token}' returned undefined or null",
+        serviceNotRegistered: config.errorMessages?.serviceNotRegistered ?? defaultMessages.serviceNotRegistered,
+        circularDependency: config.errorMessages?.circularDependency ?? defaultMessages.circularDependency,
+        maxDepthExceeded: config.errorMessages?.maxDepthExceeded ?? defaultMessages.maxDepthExceeded,
+        invalidFactory: config.errorMessages?.invalidFactory ?? defaultMessages.invalidFactory,
       },
-      ...config,
     }
   }
 
@@ -397,7 +406,7 @@ export class DIContainer {
    * @returns Formatted message
    */
   private formatErrorMessage(template: string, variables: Record<string, any>): string {
-    return template.replace(/\{(\w+)\}/g, (match, key) => {
+    return template.replace(/\{(\w+)\}/g, (match, key: string) => {
       return variables[key] !== undefined ? String(variables[key]) : match
     })
   }

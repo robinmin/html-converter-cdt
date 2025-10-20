@@ -6,14 +6,16 @@
  */
 
 import { randomBytes } from "node:crypto"
-import { existsSync, mkdir, rm } from "node:fs/promises"
-import { join, tmpdir } from "node:path"
+import { existsSync } from "node:fs"
+import { mkdir, rm } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import process from "node:process"
 
 import type { LaunchedChrome } from "chrome-launcher"
 import { launch } from "chrome-launcher"
 
-import type { Logger } from "../../../strategies/types.js"
+import type { Logger } from "../../architecture/strategies/types.js"
 
 /**
  * Comprehensive secure Chrome flags for production use

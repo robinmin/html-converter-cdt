@@ -8,6 +8,7 @@
 import { randomUUID } from "node:crypto"
 
 import type { CDPClient } from "../../architecture/adapters/cdp/CDPClient.js"
+import { CDPConnectionStatus } from "../../architecture/adapters/cdp/types.js"
 import type { Logger } from "../../architecture/strategies/types.js"
 import type { ChromeCDPManagerConfig, ChromeProcess } from "../engine/chrome-cdp-manager.js"
 
@@ -257,7 +258,7 @@ export class ChromeInstancePool {
       : 0
 
     // Calculate operations per second
-    const timeSinceLastStats = now - this.operationStats.lastStatsTime.getTime()
+    const timeSinceLastStats = now - this.operationStats.lastStatsTime
     const operationsPerSecond = timeSinceLastStats > 0
       ? (this.operationStats.totalOperations / (timeSinceLastStats / 1000))
       : 0
@@ -321,7 +322,7 @@ export class ChromeInstancePool {
       .filter(i => !i.inUse && i.healthy)
       .sort((a, b) => a.lastUsed.getTime() - b.lastUsed.getTime())
 
-    return idleInstances.length > 0 ? idleInstances[0] : null
+    return idleInstances.length > 0 ? idleInstances[0]! : null
   }
 
   /**
@@ -417,24 +418,24 @@ export class ChromeInstancePool {
   private async createCDPClient(_process: ChromeProcess): Promise<CDPClient> {
     // In a real implementation, this would create a real CDP client
     // For now, we'll create a mock client
-    const mockClient: CDPClient = {
+    const mockClient = {
       connect: async () => {},
       close: async () => {},
       isConnected: () => true,
       sendCommand: async (_method: string, _params?: any) => {
-        return { success: true, result: null }
+        return { success: true, result: null, executionTime: 0 }
       },
       evaluate: async (_expression: string) => ({ value: null }),
-      addEventListener: () => {},
+      addEventListener: (_event: any, _handler: any) => "mock-id",
       removeEventListener: () => {},
-      getStatus: () => "connected",
+      getStatus: () => CDPConnectionStatus.CONNECTED,
       getSessions: () => [],
       getSession: () => undefined,
       getTargets: () => [],
       getTarget: () => undefined,
     }
 
-    return mockClient
+    return mockClient as any as CDPClient
   }
 
   /**

@@ -1,3 +1,5 @@
+/// <reference path="../../types/globals.d.ts" />
+
 import process from "node:process"
 
 import type { Logger } from "../../architecture/strategies/types"
@@ -493,7 +495,7 @@ export class BrowserCapabilityDetector implements IBrowserCapabilityDetector {
   private async checkNodeCanvas(_timeout: number): Promise<boolean> {
     try {
       // Dynamic import to avoid bundling issues
-      const nodeCanvas = await import("canvas")
+      const nodeCanvas = await import("canvas" as any)
       return !!nodeCanvas.default || !!nodeCanvas
     } catch {
       return false
@@ -517,7 +519,7 @@ export class BrowserCapabilityDetector implements IBrowserCapabilityDetector {
   }
 
   private detectCanvasExportFormats(testCanvas: HTMLCanvasElement): string[] {
-    const formats = []
+    const formats: string[] = []
 
     try {
       const ctx = testCanvas.getContext("2d")

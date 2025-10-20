@@ -33,7 +33,7 @@ export interface ServiceDescriptor {
 /**
  * Service factory function type
  */
-export type ServiceFactory = (container: DIContainer) => any
+export type ServiceFactory = (container: any) => any
 
 /**
  * Service registration options

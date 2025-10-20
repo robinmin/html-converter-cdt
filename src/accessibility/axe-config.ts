@@ -16,7 +16,6 @@ export const axeConfig: Partial<RunOptions> = {
     // Color and contrast
     "color-contrast": {
       enabled: true,
-      reviewOnFail: false,
     },
 
     // Keyboard and navigation
@@ -245,24 +244,16 @@ export const axeConfig: Partial<RunOptions> = {
   },
 
   // Target WCAG 2.1 AA compliance
-  tags: ["wcag2a", "wcag21aa", "wcag412", "cat.aria", "cat.color", "cat.keyboard", "cat.language", "cat.name-role-value", "cat.semantics", "cat.sensory-and-visual-cues", "cat.structure", "cat.tables", "cat.time-and-media", "cat.widgets"],
+  runOnly: {
+    type: "tag",
+    values: ["wcag2a", "wcag21aa", "wcag412", "best-practice"],
+  },
 
   // Reporter configuration
   reporter: "v2" as const,
 
-  // Include only the main content area for testing
-  include: [["main"], ["header"], ["footer"], ["[role=\"dialog\"]"]],
-
-  // Exclude known false positives or third-party content
-  exclude: [
-    // Exclude script tags and style tags
-    ["script"],
-    ["style"],
-    // Exclude noscript tags
-    ["noscript"],
-    // Exclude meta tags (except viewport)
-    ["meta:not([name=\"viewport\"])"],
-  ],
+  // Note: include/exclude should be passed as context parameter when running axe, not in RunOptions
+  // Example: axe.run(document, { include: [["main"]], exclude: [["script"]] }, runOptions)
 
   // Configure result types
   resultTypes: ["violations", "incomplete", "inapplicable"] as const,
@@ -270,104 +261,9 @@ export const axeConfig: Partial<RunOptions> = {
   // Performance optimizations
   pingWaitTime: 500,
 
-  // Configure specific rules for our application
-  configuredRules: {
-    // Skip link specific configuration
-    "skip-link": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Focus management for our dynamic content
-    "focus-trap": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Live regions for progress updates
-    "aria-live": {
-      enabled: true,
-    },
-
-    // Form validation errors
-    "aria-errormessage": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Button requirements
-    "button-name": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Link requirements
-    "link-name": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Input requirements
-    "input-button-name": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Landmark requirements
-    "landmark-one-main": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Page structure requirements
-    "page-has-heading-one": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Color contrast requirements
-    "color-contrast": {
-      enabled: true,
-      reviewOnFail: false,
-      // Configure contrast thresholds for AA compliance
-      options: {
-        noScroll: false,
-      },
-    },
-
-    // Language requirements
-    "html-has-lang": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Document title
-    "document-title": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Meta viewport
-    "meta-viewport": {
-      enabled: true,
-      reviewOnFail: false,
-      options: {
-        scaleMinimum: 1,
-      },
-    },
-
-    // Tab order
-    "tabindex": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-
-    // Focus order
-    "focus-order-semantics": {
-      enabled: true,
-      reviewOnFail: false,
-    },
-  },
+  // Note: Additional rule configurations were removed as 'configuredRules' is not a valid RunOptions property
+  // These were already covered in the 'rules' object above (lines 17-244)
+  // If you need to add more rule-specific configurations, add them to the 'rules' object
 }
 
 /**
@@ -389,7 +285,10 @@ export const criticalAxeConfig: Partial<RunOptions> = {
     "duplicate-id": { enabled: true },
   },
 
-  tags: ["wcag2a", "wcag21aa", "critical"],
+  runOnly: {
+    type: "tag",
+    values: ["wcag2a", "wcag21aa", "best-practice"],
+  },
 
   reporter: "v2" as const,
 
@@ -406,7 +305,6 @@ export const customRulesConfig = {
       id: "progressbar-accessibility",
       selector: "[role=\"progressbar\"]",
       enabled: true,
-      reviewOnFail: false,
       description: "Progress bars must be properly labeled and announce updates",
       help: "Progress elements must have accessible names and provide status updates",
       helpUrl: "https://www.w3.org/TR/wai-aria-1.1/#progressbar",
@@ -505,13 +403,11 @@ export const defaultRunOptions: RunOptions = {
   ...axeConfig,
   // Additional configuration for CI/CD
   pingWaitTime: 1000,
-  timeout: 10000,
+  frameWaitTime: 10000,
   // Configure for automated testing
   absolutePaths: false,
-  allowedOrigins: ["*"],
-  // Include iframes and shadow DOM
+  // Include iframes
   iframes: false,
-  shadowDOM: false,
 }
 
 /**
@@ -546,6 +442,11 @@ export function runDetailedAccessibilityAudit(context?: Element | Document): Pro
 }
 
 /**
+ * Impact severity levels
+ */
+type ImpactValue = "minor" | "moderate" | "serious" | "critical" | null
+
+/**
  * Format accessibility results for reporting
  */
 export function formatAccessibilityResults(results: AxeResults): {
@@ -559,13 +460,13 @@ export function formatAccessibilityResults(results: AxeResults): {
   violations: Array<{
     rule: string
     description: string
-    impact: string
+    impact: ImpactValue
     help: string
     helpUrl: string
     nodes: Array<{
       html: string
-      target: string[]
-      failureSummary: string
+      target: any[]
+      failureSummary: string | undefined
     }>
   }>
 } {
@@ -640,4 +541,7 @@ export function checkWCAGCompliance(results: AxeResults): {
 }
 
 // Export types for TypeScript
-export type { AxeResults, Impact, NodeResult, Result, Rule, RunOptions, Spec } from "axe-core"
+export type { AxeResults, NodeResult, Result, Rule, RunOptions, Spec } from "axe-core"
+
+// Export ImpactValue type for use in other modules
+export type { ImpactValue }

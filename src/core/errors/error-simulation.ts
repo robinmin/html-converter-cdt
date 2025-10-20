@@ -27,8 +27,8 @@
  */
 
 import type { ErrorContext } from "./conversion-error.js"
-import { ConversionError, getCategoryFromCode, getSeverityFromCode } from "./conversion-error.js"
-import { ERROR_MESSAGES, ErrorCode } from "./error-codes.js"
+import { ConversionError, ErrorCode, getCategoryFromCode, getSeverityFromCode } from "./conversion-error.js"
+import { ERROR_MESSAGES } from "./error-codes.js"
 
 /**
  * Error simulation configuration
@@ -122,30 +122,30 @@ export class ErrorSimulator {
     const { url = "https://example.com", timeout = 30000, statusCode, cause = "connection" } = options
 
     let errorCode: ErrorCode
-    const context: Partial<ErrorContext> = { url, timeout }
+    const metadata: Record<string, any> = { url, timeout }
 
     switch (cause) {
       case "timeout":
         errorCode = ErrorCode.NETWORK_TIMEOUT
-        context.timeoutDuration = timeout
+        metadata.timeoutDuration = timeout
         break
       case "dns":
         errorCode = ErrorCode.NETWORK_DNS_ERROR
-        context.dnsError = true
+        metadata.dnsError = true
         break
       case "ssl":
         errorCode = ErrorCode.NETWORK_SSL_ERROR
-        context.sslError = true
+        metadata.sslError = true
         break
       default:
         errorCode = ErrorCode.NETWORK_CONNECTION_FAILED
-        context.connectionError = true
+        metadata.connectionError = true
         if (statusCode) {
-          context.httpStatus = statusCode
+          metadata.httpStatus = statusCode
         }
     }
 
-    return this.simulateError(errorCode, { metadata: context })
+    return this.simulateError(errorCode, { resource: url, metadata })
   }
 
   /**
@@ -199,9 +199,12 @@ export class ErrorSimulator {
     }
 
     return this.simulateError(errorCode, {
-      fileOperation: operation,
-      filePath,
-      errnoCode: errorType,
+      resource: filePath,
+      metadata: {
+        fileOperation: operation,
+        filePath,
+        errnoCode: errorType,
+      },
     })
   }
 
@@ -229,10 +232,12 @@ export class ErrorSimulator {
     }
 
     return this.simulateError(errorCode, {
-      sourceFormat,
-      targetFormat,
-      conversionStage: stage,
-      errorDetails: details,
+      metadata: {
+        sourceFormat,
+        targetFormat,
+        conversionStage: stage,
+        errorDetails: details,
+      },
     })
   }
 
@@ -247,9 +252,12 @@ export class ErrorSimulator {
     const { operation = "page rendering", memoryUsage = 1024 * 1024 * 1024, limit = 512 * 1024 * 1024 } = options
 
     return this.simulateError(ErrorCode.MEMORY_LIMIT_EXCEEDED, {
-      memoryOperation: operation,
-      currentMemoryUsage: memoryUsage,
-      memoryLimit: limit,
+      operation,
+      metadata: {
+        memoryOperation: operation,
+        currentMemoryUsage: memoryUsage,
+        memoryLimit: limit,
+      },
     })
   }
 
@@ -259,9 +267,11 @@ export class ErrorSimulator {
   simulateErrorChain(errorCodes: ErrorCode[]): ConversionError[] {
     return errorCodes.map((code, index) => {
       const context: Partial<ErrorContext> = {
-        chainIndex: index,
-        chainLength: errorCodes.length,
-        previousError: index > 0 ? errorCodes[index - 1] : undefined,
+        metadata: {
+          chainIndex: index,
+          chainLength: errorCodes.length,
+          previousError: index > 0 ? errorCodes[index - 1] : undefined,
+        },
       }
 
       return this.simulateError(code, context)
@@ -280,14 +290,17 @@ export class ErrorSimulator {
     } as const
 
     return this.simulateError(severityMap[severity], {
-      severity,
-      priority: severity,
+      metadata: {
+        severity,
+        priority: severity,
+      },
     })
   }
 
   private interpolateMessage(template: string, context: ErrorContext): string {
     return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-      return context[key]?.toString() || match
+      const value = context.metadata?.[key]
+      return value?.toString() || match
     })
   }
 

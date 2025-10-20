@@ -5,8 +5,12 @@
  * a unified API across Node.js and browser environments.
  */
 
-import type { Logger } from "../../strategies/types.js"
-import type { CDPClient, CDPConnectionConfig, CDPConnectionStatus, CDPEvents, CDPSession, CDPTarget } from "../cdp/types.js"
+import type { CDPClient } from "../architecture/adapters/cdp/CDPClient.js"
+import type { CDPConnectionConfig, CDPConnectionStatus, CDPEvents, CDPSession, CDPTarget } from "../architecture/adapters/cdp/types.js"
+import type { Logger } from "../architecture/strategies/types.js"
+
+// Re-export types for convenience
+export type { CDPClient, CDPConnectionConfig, CDPConnectionStatus, CDPEvents, CDPSession, CDPTarget }
 
 /**
  * CDP Environment types

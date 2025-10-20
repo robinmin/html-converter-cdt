@@ -339,7 +339,7 @@ function mergeDeep<T extends Record<string, any>>(target: T, source: Partial<T>)
   for (const key in source) {
     if (source[key] !== undefined) {
       if (source[key] !== null && typeof source[key] === "object" && !Array.isArray(source[key])) {
-        result[key] = mergeDeep(result[key] || {}, source[key] as any)
+        result[key] = mergeDeep((result[key] as Record<string, any>) || {}, source[key] as any) as T[Extract<keyof T, string>]
       } else {
         result[key] = source[key] as any
       }
@@ -385,26 +385,27 @@ export function getEnvironmentConfig(environment?: string): Config {
  */
 export function validateSecurityDefaults(config: Config): { isValid: boolean, warnings: string[] } {
   const warnings: string[] = []
+  const base = config.base ?? DEFAULT_BASE_CONFIG
 
   // Check security-critical settings
-  if (!config.base.enableSandbox) {
+  if (!base.enableSandbox) {
     warnings.push("Sandboxing is disabled - this may pose security risks")
   }
 
-  if (config.base.allowInsecureConnections) {
+  if (base.allowInsecureConnections) {
     warnings.push("Insecure connections are allowed - this may pose security risks")
   }
 
-  if (config.base.timeout > 300000) {
+  if (base.timeout > 300000) {
     warnings.push("Very long timeout may allow resource exhaustion attacks")
   }
 
-  if (config.base.memoryLimit > 2048) {
+  if (base.memoryLimit > 2048) {
     warnings.push("High memory limit may allow resource exhaustion attacks")
   }
 
   // Check Chrome security settings
-  if (config.base.chromeArgs && config.base.chromeArgs.includes("--no-sandbox")) {
+  if (base.chromeArgs && base.chromeArgs.includes("--no-sandbox")) {
     warnings.push("Chrome sandboxing is disabled - this may pose security risks")
   }
 
@@ -419,26 +420,29 @@ export function validateSecurityDefaults(config: Config): { isValid: boolean, wa
  */
 export function validatePerformanceDefaults(config: Config): { isValid: boolean, suggestions: string[] } {
   const suggestions: string[] = []
+  const base = config.base ?? DEFAULT_BASE_CONFIG
+  const pdf = config.pdf ?? DEFAULT_PDF_CONFIG
+  const image = config.image ?? DEFAULT_IMAGE_CONFIG
 
   // Check performance settings
-  if (config.base.concurrency < 1 || config.base.concurrency > 10) {
+  if (base.concurrency < 1 || base.concurrency > 10) {
     suggestions.push("Consider setting concurrency between 1-10 for optimal performance")
   }
 
-  if (config.base.timeout < 5000) {
+  if (base.timeout < 5000) {
     suggestions.push("Very short timeout may cause conversion failures")
   }
 
-  if (config.base.memoryLimit < 128) {
+  if (base.memoryLimit < 128) {
     suggestions.push("Very low memory limit may cause conversion failures")
   }
 
   // Check format-specific performance settings
-  if (config.pdf.scale < 0.5 || config.pdf.scale > 2.0) {
+  if (pdf.scale < 0.5 || pdf.scale > 2.0) {
     suggestions.push("Consider PDF scale between 0.5-2.0 for optimal performance")
   }
 
-  if (config.image.quality < 50 || config.image.quality > 95) {
+  if (image.quality < 50 || image.quality > 95) {
     suggestions.push("Consider image quality between 50-95 for optimal performance")
   }
 

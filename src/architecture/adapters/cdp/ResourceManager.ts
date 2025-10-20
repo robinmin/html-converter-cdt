@@ -368,7 +368,7 @@ export class CDPResourceManager {
     if (error.message) {
       // Extract error type from message
       const match = error.message.match(/^([A-Z][a-z]+(?:Error|Exception)):/)
-      if (match) {
+      if (match && match[1]) {
         return match[1].toLowerCase()
       }
     }

@@ -560,15 +560,21 @@ export class EnvironmentMapper {
 
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i]
+      if (!key) {
+        continue
+      }
 
       if (!(key in current) || current[key] === null || typeof current[key] !== "object") {
         current[key] = {}
       }
 
-      current = current[key]
+      current = current[key] as Record<string, any>
     }
 
-    current[keys[keys.length - 1]] = value
+    const lastKey = keys[keys.length - 1]
+    if (lastKey) {
+      current[lastKey] = value
+    }
   }
 
   /**
@@ -642,19 +648,19 @@ export class EnvironmentMapper {
 
     for (const mapping of this.mappings) {
       if (mapping.configPath.startsWith("base.")) {
-        grouped["Base Configuration"].push(mapping)
+        grouped["Base Configuration"]!.push(mapping)
       } else if (mapping.configPath.startsWith("pdf.")) {
-        grouped["PDF Configuration"].push(mapping)
+        grouped["PDF Configuration"]!.push(mapping)
       } else if (mapping.configPath.startsWith("image.")) {
-        grouped["Image Configuration"].push(mapping)
+        grouped["Image Configuration"]!.push(mapping)
       } else if (mapping.configPath.startsWith("markdown.")) {
-        grouped["Markdown Configuration"].push(mapping)
+        grouped["Markdown Configuration"]!.push(mapping)
       } else if (mapping.configPath.startsWith("docx.")) {
-        grouped["DOCX Configuration"].push(mapping)
+        grouped["DOCX Configuration"]!.push(mapping)
       } else if (mapping.configPath.startsWith("mhtml.")) {
-        grouped["MHTML Configuration"].push(mapping)
+        grouped["MHTML Configuration"]!.push(mapping)
       } else {
-        grouped["Global Configuration"].push(mapping)
+        grouped["Global Configuration"]!.push(mapping)
       }
     }
 

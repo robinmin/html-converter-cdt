@@ -248,7 +248,7 @@ export class CDPEventManager {
       history = history.filter(item => item.event === event)
     }
 
-    return history.slice(-limit || history.length)
+    return history.slice(-(limit ?? history.length))
   }
 
   /**
@@ -368,6 +368,10 @@ export class CDPEventManager {
       }
 
       const middleware = applicableMiddleware[index++]
+      if (!middleware) {
+        finalHandler()
+        return
+      }
       try {
         middleware.handler(event, params, next)
       } catch (error) {

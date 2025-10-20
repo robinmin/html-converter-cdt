@@ -159,14 +159,14 @@ export const MHTMLConfigSchema = z.object({
  */
 export const ConfigSchema = z.object({
   // Base configuration
-  base: BaseConfigSchema.default({}),
+  base: BaseConfigSchema.optional(),
 
   // Format-specific configurations
-  pdf: PDFConfigSchema.default({}),
-  image: ImageConfigSchema.default({}),
-  markdown: MarkdownConfigSchema.default({}),
-  docx: DOCXConfigSchema.default({}),
-  mhtml: MHTMLConfigSchema.default({}),
+  pdf: PDFConfigSchema.optional(),
+  image: ImageConfigSchema.optional(),
+  markdown: MarkdownConfigSchema.optional(),
+  docx: DOCXConfigSchema.optional(),
+  mhtml: MHTMLConfigSchema.optional(),
 
   // Global settings
   defaultFormat: z.enum(["pdf", "image", "markdown", "docx", "mhtml"]).default("pdf"),
@@ -504,17 +504,17 @@ export function validateConfig(config: unknown): {
       const validatedConfig = result.data
 
       // Validate Chrome path if provided
-      if (validatedConfig.base.chromePath && !validateFilePath(validatedConfig.base.chromePath)) {
+      if (validatedConfig.base?.chromePath && !validateFilePath(validatedConfig.base.chromePath)) {
         errors.push("Invalid Chrome path: path contains invalid characters or is malformed")
       }
 
       // Validate output path if provided
-      if (validatedConfig.base.outputPath && !validateFilePath(validatedConfig.base.outputPath)) {
+      if (validatedConfig.outputPath && !validateFilePath(validatedConfig.outputPath)) {
         errors.push("Invalid output path: path contains invalid characters or is malformed")
       }
 
       // Validate image asset path
-      if (validatedConfig.markdown.imageAssetPath && !validateFilePath(validatedConfig.markdown.imageAssetPath)) {
+      if (validatedConfig.markdown?.imageAssetPath && !validateFilePath(validatedConfig.markdown.imageAssetPath)) {
         errors.push("Invalid image asset path: path contains invalid characters or is malformed")
       }
 

@@ -7,7 +7,7 @@
 
 import type { Buffer } from "node:buffer"
 
-import type { CDPClient } from "../../architecture/adapters/cdp/types.js"
+import type { CDPClient } from "../../architecture/adapters/cdp/CDPClient.js"
 import type { Logger } from "../../architecture/strategies/types.js"
 import type { ExternalResource, MHTMLOptions } from "../../converters/mhtml/types.js"
 import { ExternalDependencyDetector, MHTMLProcessor } from "../engine/mhtml-processor.js"
@@ -74,10 +74,12 @@ export interface MHTMLProcessingResult {
 class MHTMLFileProcessor implements IFileProcessor<string, string> {
   private logger: Logger
   private mhtmlProcessor: MHTMLProcessor
+  private secureFileManager: SecureFileManager
 
   constructor(logger: Logger, mhtmlProcessor: MHTMLProcessor) {
     this.logger = logger
     this.mhtmlProcessor = mhtmlProcessor
+    this.secureFileManager = new SecureFileManager(this.logger)
   }
 
   async processFile(inputPath: string, outputPath: string): Promise<string> {
@@ -104,9 +106,6 @@ class MHTMLFileProcessor implements IFileProcessor<string, string> {
   getOutputExtension(): string {
     return "mhtml"
   }
-
-  // This should be properly injected - this is just for the interface
-  private secureFileManager = new SecureFileManager(this.logger)
 }
 
 /**
@@ -376,7 +375,7 @@ export class EnhancedMHTMLProcessor {
     )
 
     // Convert batch results to MHTML processing results
-    for (const _successFile of batchResult.successfulFiles) {
+    for (let i = 0; i < batchResult.successfulFiles; i++) {
       // This would need to be enhanced to get actual MHTML processing results
       // For now, we create a placeholder result
       results.push({
@@ -671,7 +670,7 @@ ${htmlContent}
    */
   private extractTitleFromHTML(htmlContent: string): string | undefined {
     const titleMatch = htmlContent.match(/<title[^>]*>([^<]+)<\/title>/i)
-    return titleMatch ? titleMatch[1].trim() : undefined
+    return titleMatch?.[1]?.trim()
   }
 
   /**

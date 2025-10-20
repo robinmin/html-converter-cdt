@@ -372,22 +372,22 @@ export class CDPTargetManager {
    * Setup event handlers for target management
    */
   private setupEventHandlers(): void {
-    this.eventManager.on("Target.targetCreated", (params) => {
+    this.eventManager.on("Target.targetCreated" as any, (params: any) => {
       this.targets.set(params.targetInfo.targetId, params.targetInfo)
       this.logger.debug(`Target created: ${params.targetInfo.targetId}`)
     })
 
-    this.eventManager.on("Target.targetDestroyed", (params) => {
+    this.eventManager.on("Target.targetDestroyed" as any, (params: any) => {
       this.targets.delete(params.targetId)
       this.logger.debug(`Target destroyed: ${params.targetId}`)
     })
 
-    this.eventManager.on("Target.targetInfoChanged", (params) => {
+    this.eventManager.on("Target.targetInfoChanged" as any, (params: any) => {
       this.targets.set(params.targetInfo.targetId, params.targetInfo)
       this.logger.debug(`Target info changed: ${params.targetInfo.targetId}`)
     })
 
-    this.eventManager.on("Target.detachedFromTarget", (params) => {
+    this.eventManager.on("Target.detachedFromTarget" as any, (params: any) => {
       const session = this.sessions.get(params.sessionId)
       if (session) {
         session.isActive = false
@@ -463,7 +463,7 @@ export class CDPTargetManager {
 
     for (const domain of domainsToEnable) {
       try {
-        await client.sendCommand(`${domain}.enable`, {}, sessionId)
+        await client.sendCommand(`${domain}.enable`, {})
         this.logger.debug(`Enabled domain: ${domain} for session: ${sessionId}`)
       } catch (error) {
         this.logger.warn(`Failed to enable domain: ${domain}`, error as Error)

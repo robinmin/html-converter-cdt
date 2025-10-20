@@ -2,6 +2,8 @@
  * Quick environment detection utilities
  */
 
+/// <reference path="../../types/globals.d.ts" />
+
 import process from "node:process"
 
 import type { BrowserFeatures } from "./types"
@@ -33,8 +35,8 @@ export const isWebWorker = (): boolean => {
  */
 export const isServiceWorker = (): boolean => {
   return typeof globalThis !== "undefined"
-    && typeof globalThis.addEventListener === "function"
-    && typeof globalThis.skipWaiting === "function"
+    && typeof (globalThis as any).addEventListener === "function"
+    && typeof (globalThis as any).skipWaiting === "function"
 }
 
 /**

@@ -5,6 +5,8 @@
  * colored output, format detection, and comprehensive option handling.
  */
 
+import { Buffer } from "node:buffer"
+
 import chalk from "chalk"
 import { Command } from "commander"
 import type { Ora } from "ora"
@@ -84,7 +86,7 @@ async function executeConvert(
 
   // Validate input
   if (!input) {
-    showValidationError("Input is required", command.parent)
+    showValidationError("Input is required", command.parent || command)
   }
 
   // Handle stdin input
@@ -92,7 +94,7 @@ async function executeConvert(
   if (input === "-") {
     htmlContent = await readFromStdin()
     if (!htmlContent.trim()) {
-      showValidationError("No HTML content received from stdin", command.parent)
+      showValidationError("No HTML content received from stdin", command.parent || command)
     }
   } else {
     htmlContent = input // URL or file path
@@ -119,10 +121,10 @@ async function executeConvert(
   }
 
   // Build conversion options
-  const conversionOptions = buildConversionOptions(format, mergedOptions, config)
+  const conversionOptions = buildConversionOptions(format, mergedOptions, config.config)
 
-  // Convert CLI format to API format
-  const apiFormat = format === "md" ? "markdown" : format
+  // Convert CLI format to API format - handle all CLI format mappings
+  const apiFormat: ConversionFormat = format === ("md" as any) ? "markdown" : (format as ConversionFormat)
 
   // Show verbose information
   if (mergedOptions.verbose) {
@@ -158,14 +160,25 @@ async function executeConvert(
     spinner.succeed("Conversion completed successfully!")
 
     // Handle output
+    let outputBuffer: ArrayBuffer
+    if (typeof result.content === "string") {
+      const buffer = Buffer.from(result.content)
+      outputBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer
+    } else if (Buffer.isBuffer(result.content)) {
+      const buffer = result.content as Buffer
+      outputBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer
+    } else {
+      outputBuffer = result.content as ArrayBuffer
+    }
+
     if (mergedOptions.stdout) {
-      await writeToStdout(result.buffer)
+      await writeToStdout(outputBuffer)
       if (mergedOptions.verbose) {
-        showInfo(`Output ${format.toUpperCase()} data to stdout (${formatOutput(result.buffer.length)})`)
+        showInfo(`Output ${format.toUpperCase()} data to stdout (${formatOutput(outputBuffer.byteLength)})`)
       }
     } else {
       const outputPath = output || result.suggestedFileName
-      await writeOutputFile(outputPath, result.buffer)
+      await writeOutputFile(outputPath, outputBuffer)
       showSuccess(`Successfully converted to ${outputPath}`)
     }
 

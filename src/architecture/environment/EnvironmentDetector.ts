@@ -30,13 +30,13 @@ export class EnvironmentDetector implements IEnvironmentDetector {
   detectRuntime(): RuntimeEnvironment {
     try {
       // Check for Web Worker
-      if (typeof globalThis !== "undefined" && typeof importScripts === "function") {
+      if (typeof globalThis !== "undefined" && typeof (globalThis as any).importScripts === "function") {
         return RuntimeEnvironment.WEB_WORKER
       }
 
       // Check for Service Worker
       if (typeof globalThis !== "undefined" && typeof globalThis.addEventListener === "function"
-        && typeof globalThis.skipWaiting === "function") {
+        && typeof (globalThis as any).skipWaiting === "function") {
         return RuntimeEnvironment.SERVICE_WORKER
       }
 
@@ -269,25 +269,25 @@ export class EnvironmentDetector implements IEnvironmentDetector {
     // Chrome
     const chromeMatch = userAgent.match(/Chrome\/(\d+\.\d+\.\d+\.\d+)/)
     if (chromeMatch && !userAgent.includes("Edg")) {
-      return { name: "chrome", version: chromeMatch[1] }
+      return { name: "chrome", version: chromeMatch[1] || "unknown" }
     }
 
     // Edge
     const edgeMatch = userAgent.match(/Edg\/(\d+\.\d+\.\d+\.\d+)/)
     if (edgeMatch) {
-      return { name: "edge", version: edgeMatch[1] }
+      return { name: "edge", version: edgeMatch[1] || "unknown" }
     }
 
     // Firefox
     const firefoxMatch = userAgent.match(/Firefox\/(\d+\.\d+)/)
     if (firefoxMatch) {
-      return { name: "firefox", version: firefoxMatch[1] }
+      return { name: "firefox", version: firefoxMatch[1] || "unknown" }
     }
 
     // Safari
     const safariMatch = userAgent.match(/Version\/(\d+\.\d+) Safari/)
     if (safariMatch && userAgent.includes("Safari")) {
-      return { name: "safari", version: safariMatch[1] }
+      return { name: "safari", version: safariMatch[1] || "unknown" }
     }
 
     // Default fallback
@@ -364,7 +364,7 @@ export class EnvironmentDetector implements IEnvironmentDetector {
       // Try to detect Chrome DevTools Protocol availability
       try {
         // Check if we can access Chrome debugging features
-        const isChrome = typeof chrome !== "undefined" && chrome.runtime
+        const isChrome = typeof (globalThis as any).chrome !== "undefined" && (globalThis as any).chrome.runtime
         const hasRemoteDebugging = typeof window !== "undefined"
           && (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__
 
@@ -375,7 +375,7 @@ export class EnvironmentDetector implements IEnvironmentDetector {
     }
 
     // Simple detection for non-intensive mode
-    return typeof chrome !== "undefined"
+    return typeof (globalThis as any).chrome !== "undefined"
       || (typeof window !== "undefined" && window.location.protocol === "chrome-extension:")
   }
 
@@ -411,8 +411,8 @@ export class EnvironmentDetector implements IEnvironmentDetector {
 
   private detectWebRTCSupport(): boolean {
     return typeof RTCPeerConnection !== "undefined"
-      || (typeof window !== "undefined" && window.RTCPeerConnection)
-      || (typeof globalThis !== "undefined" && globalThis.RTCPeerConnection)
+      || Boolean(typeof window !== "undefined" && window.RTCPeerConnection)
+      || Boolean(typeof globalThis !== "undefined" && globalThis.RTCPeerConnection)
   }
 
   private detectGeolocationSupport(): boolean {

@@ -215,7 +215,7 @@ export class MHTMLBuilder implements IMHTMLBuilder {
       const char = content[i]!
       const code = char.charCodeAt(0)
 
-      if (code === 13 && content[i + 1] === 10) {
+      if (code === 13 && content[i + 1]?.charCodeAt(0) === 10) {
         // CRLF - line break
         result += line + "\r\n"
         line = ""
@@ -292,7 +292,7 @@ export class MHTMLBuilder implements IMHTMLBuilder {
     const boundaryMatch = content.match(/boundary="([^"]+)"/)
     if (boundaryMatch) {
       const boundary = boundaryMatch[1]
-      if (!boundary.startsWith("----=")) {
+      if (boundary && !boundary.startsWith("----=")) {
         issues.push("MIME boundary should start with '----='")
       }
     } else {
@@ -304,16 +304,18 @@ export class MHTMLBuilder implements IMHTMLBuilder {
     const match = content.match(boundaryRegex)
     if (match) {
       const boundary = match[1]
-      const boundaryCount = (content.match(new RegExp(boundary.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) || []).length
+      if (boundary) {
+        const boundaryCount = (content.match(new RegExp(boundary.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) || []).length
 
-      // Should have at least: header, document part, final boundary
-      if (boundaryCount < 3) {
-        issues.push("Insufficient boundary markers in content")
-      }
+        // Should have at least: header, document part, final boundary
+        if (boundaryCount < 3) {
+          issues.push("Insufficient boundary markers in content")
+        }
 
-      // Check for final boundary with --
-      if (!content.includes(`${boundary}--`)) {
-        issues.push("Missing final boundary marker (boundary--)")
+        // Check for final boundary with --
+        if (!content.includes(`${boundary}--`)) {
+          issues.push("Missing final boundary marker (boundary--)")
+        }
       }
     }
 

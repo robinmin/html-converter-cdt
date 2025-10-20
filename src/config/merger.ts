@@ -139,7 +139,7 @@ export class ConfigMerger {
   /**
    * Deep merge two objects with array handling strategies
    */
-  private mergeDeep<T extends Record<string, any>>(
+  mergeDeep<T extends Record<string, any>>(
     target: T,
     source: Partial<T>,
     options: {
@@ -170,7 +170,7 @@ export class ConfigMerger {
       if (Array.isArray(sourceValue)) {
         // Handle array merging based on strategy
         const strategy = customStrategies[currentPath] || arrayMergeStrategy
-        result[key] = this.mergeArrays(targetValue, sourceValue, strategy)
+        result[key] = this.mergeArrays(targetValue, sourceValue, strategy) as any
       } else if (
         sourceValue !== null
         && typeof sourceValue === "object"
@@ -183,10 +183,10 @@ export class ConfigMerger {
         result[key] = this.mergeDeep(targetValue, sourceValue, {
           ...options,
           path: currentPath,
-        })
+        }) as any
       } else {
         // Replace primitive values or incompatible types
-        result[key] = sourceValue
+        result[key] = sourceValue as any
       }
     }
 
@@ -382,18 +382,24 @@ export class ConflictDetector {
 
       if (values.length > 1) {
         // Check if values are different
-        const firstValue = values[0].value
+        const first = values[0]
+        const second = values[1]
+        if (!first || !second) {
+          continue
+        }
+
+        const firstValue = first.value
         const hasConflict = values.slice(1).some(item => !this.deepEqual(item.value, firstValue))
 
         if (hasConflict) {
           conflicts.push({
             path,
-            source1: values[0].source,
-            source2: values[1].source,
-            value1: values[0].value,
-            value2: values[1].value,
-            priority1: values[0].priority,
-            priority2: values[1].priority,
+            source1: first.source,
+            source2: second.source,
+            value1: first.value,
+            value2: second.value,
+            priority1: first.priority,
+            priority2: second.priority,
           })
         }
       }
@@ -470,13 +476,13 @@ export class ConfigInheritance {
     const { base } = config
 
     // Inherit timeout to format-specific configs if they don't have their own
-    if (base.timeout) {
+    if (base?.timeout) {
       // Format-specific timeout handling would be implemented here
       // This is a placeholder for the concept
     }
 
     // Inherit verbosity settings
-    if (base.verbose !== undefined) {
+    if (base?.verbose !== undefined) {
       // Apply verbose setting to format-specific configs
     }
   }

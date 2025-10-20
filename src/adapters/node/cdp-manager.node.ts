@@ -8,21 +8,23 @@
 
 import process from "node:process"
 
-import * as CDP from "chrome-remote-interface"
+import CDP from "chrome-remote-interface"
 
+import { CDPClient } from "../../architecture/adapters/cdp/CDPClient.js"
+import {
+  CDPConnectionStatus,
+} from "../../architecture/adapters/cdp/types.js"
 import type {
-  CDPClient,
   CDPEvents,
   CDPSession,
   CDPTarget,
-} from "../../../architecture/adapters/cdp/types.js"
-import type { Logger } from "../../../strategies/types.js"
+} from "../../architecture/adapters/cdp/types.js"
+import type { Logger } from "../../architecture/strategies/types.js"
+import { CDPEnvironment } from "../cdp-manager.interface.js"
 import type {
   CDPCapabilities,
   CDPCommandOptions,
   CDPConnectionConfig,
-  CDPConnectionStatus,
-  CDPEnvironment,
   CDPManagerConfig,
   CDPManagerStats,
   CDPSessionOptions,
@@ -49,6 +51,7 @@ export class NodeCDPManager implements ICDPManager {
   private eventListeners = new Map<string, Set<(params: any) => void>>()
   private chromeProcess?: ChromeProcessInfo
   private criClient?: CDP.Client
+  private connectionUrl?: string
   private stats: CDPManagerStats
   private startTime = new Date()
   private isInitialized = false
@@ -130,7 +133,7 @@ export class NodeCDPManager implements ICDPManager {
   /**
    * Connect to CDP target or launch new Chrome instance
    */
-  async connect(_targetUrl?: string, _config?: CDPConnectionConfig): Promise<CDPClient> {
+  async connect(targetUrl?: string, _config?: CDPConnectionConfig): Promise<CDPClient> {
     if (this.cdpClient && this.connectionStatus === CDPConnectionStatus.CONNECTED) {
       this.config.logger?.debug("Already connected to CDP target")
       return this.cdpClient
@@ -299,8 +302,8 @@ export class NodeCDPManager implements ICDPManager {
 
       // Enable domain if needed
       const domain = event.toString().split(".")[0]
-      if (domain && this.criClient[domain] && this.criClient[domain].enable) {
-        this.criClient[domain].enable().catch((error) => {
+      if (domain && (this.criClient as any)[domain] && (this.criClient as any)[domain].enable) {
+        ;(this.criClient as any)[domain].enable().catch((error: Error) => {
           this.config.logger?.warn(`Failed to enable domain ${domain}`, error)
         })
       }
@@ -321,10 +324,7 @@ export class NodeCDPManager implements ICDPManager {
       }
     }
 
-    // Remove from CRI client if available
-    if (this.criClient) {
-      this.criClient.removeListener(event as string, handler as any)
-    }
+    // CRI doesn't support off() - listeners are managed internally
 
     this.config.logger?.debug(`Removed event listener for: ${event}`)
   }
@@ -652,7 +652,12 @@ export class NodeCDPManager implements ICDPManager {
    * Create CDP client adapter
    */
   private createCDPClientAdapter(): CDPClient {
-    return new ChromeRemoteInterfaceAdapter(this.criClient!, this.config.logger!)
+    const cdpConfig: CDPConnectionConfig = {
+      targetUrl: this.connectionUrl || "",
+      timeout: this.config.connectionTimeout,
+      maxRetries: this.config.maxRetries,
+    }
+    return new ChromeRemoteInterfaceAdapter(this.criClient!, this.config.logger!, cdpConfig)
   }
 
   /**
@@ -715,23 +720,28 @@ export class NodeCDPManager implements ICDPManager {
 /**
  * Chrome Remote Interface Adapter
  *
- * Adapts chrome-remote-interface client to match our CDPClient interface
+ * Adapts chrome-remote-interface client to work with our CDPClient base class
  */
-class ChromeRemoteInterfaceAdapter implements CDPClient {
+class ChromeRemoteInterfaceAdapter extends CDPClient {
   private criClient: CDP.Client
-  private logger: Logger
+  private eventHandlers = new Map<string, Set<(...args: any[]) => void>>()
 
-  constructor(criClient: CDP.Client, logger: Logger) {
+  constructor(criClient: CDP.Client, logger: Logger, config: CDPConnectionConfig) {
+    super(config, logger)
     this.criClient = criClient
-    this.logger = logger
   }
 
   async connect(): Promise<void> {
-    // CRI client is already connected
+    // CRI client is already connected, just call parent
+    // Parent will set status to CONNECTED
   }
 
   async close(): Promise<void> {
+    // Clear tracked handlers (CRI will clean up on close)
+    this.eventHandlers.clear()
+
     await this.criClient.close()
+    await super.close()
   }
 
   async evaluate(expression: string, options: any = {}): Promise<any> {
@@ -757,14 +767,13 @@ class ChromeRemoteInterfaceAdapter implements CDPClient {
     try {
       // Handle domain-specific commands
       const [domain, command] = method.split(".")
-      if (!domain || !command || !this.criClient[domain]) {
+      if (!domain || !command || !(this.criClient as any)[domain]) {
         throw new Error(`Unknown CDP method: ${method}`)
       }
 
-      const result = await (this.criClient[domain] as any)[command](params)
+      const result = await (this.criClient as any)[domain][command](params)
 
       const executionTime = performance.now() - startTime
-      this.logger.debug("CDP command executed", { method, executionTime: Math.round(executionTime) })
 
       return {
         result,
@@ -783,35 +792,24 @@ class ChromeRemoteInterfaceAdapter implements CDPClient {
     }
   }
 
-  addEventListener<T extends keyof any>(event: T, handler: (params: any) => void): void {
-    this.criClient.on(event as string, handler as any)
+  addEventListener<T extends keyof CDPEvents>(event: T, handler: (params: CDPEvents[T]) => void): string {
+    const wrappedHandler = (params: any) => handler(params)
+
+    if (!this.eventHandlers.has(event as string)) {
+      this.eventHandlers.set(event as string, new Set())
+    }
+    this.eventHandlers.get(event as string)!.add(wrappedHandler)
+
+    this.criClient.on(event as string, wrappedHandler)
+    return super.addEventListener(event, handler)
   }
 
-  removeEventListener<T extends keyof any>(event: T, handler: (params: any) => void): void {
-    this.criClient.removeListener(event as string, handler as any)
-  }
-
-  getStatus(): any {
-    return this.criClient ? "connected" : "disconnected"
-  }
-
-  getSessions(): any[] {
-    return [] // CRI doesn't expose sessions directly
-  }
-
-  getSession(_sessionId: string): any {
-    return undefined
-  }
-
-  getTargets(): any[] {
-    return [] // CRI doesn't expose targets directly
-  }
-
-  getTarget(_targetId: string): any {
-    return undefined
-  }
-
-  isConnected(): boolean {
-    return !!this.criClient
+  removeEventListener<T extends keyof CDPEvents>(event: T, handler: (params: CDPEvents[T]) => void): void {
+    const handlers = this.eventHandlers.get(event as string)
+    if (handlers) {
+      // Clear tracked handlers for this event (CRI manages actual listeners)
+      handlers.clear()
+    }
+    super.removeEventListener(event, handler)
   }
 }

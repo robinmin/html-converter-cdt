@@ -29,6 +29,8 @@
   "scripts": {
     "build": "tsup",
     "lint": "eslint --fix .",
+    "typecheck": "tsc --noEmit",
+    "validate": "pnpm typecheck && pnpm lint && pnpm build && pnpm test:unit",
     "prepare": "husky",
     "prepublishOnly": "pnpm build",
     "test": "vitest run --no-coverage",

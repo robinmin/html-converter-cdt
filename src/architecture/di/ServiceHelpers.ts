@@ -76,7 +76,7 @@ export class ServiceHelpers {
     config: T | ServiceFactory,
   ): void {
     if (typeof config === "function") {
-      container.registerSingleton(ServiceTokens.Configuration, config)
+      container.registerSingleton(ServiceTokens.Configuration, config as ServiceFactory)
     } else {
       container.registerInstance(ServiceTokens.Configuration, config)
     }
@@ -202,9 +202,9 @@ export class ServiceHelpers {
     converterFactory: (logger: Logger, ...deps: any[]) => any,
     dependencies: string[] = [],
   ): void {
-    container.registerTransient(token, (container) => {
-      const logger = container.resolve<Logger>(ServiceTokens.Logger)
-      const deps = dependencies.map(dep => container.resolve(dep))
+    container.registerTransient(token, (c: DIContainer) => {
+      const logger = c.resolve<Logger>(ServiceTokens.Logger)
+      const deps = dependencies.map(dep => c.resolve(dep))
       return converterFactory(logger, ...deps)
     }, {
       dependencies: [ServiceTokens.Logger, ...dependencies],

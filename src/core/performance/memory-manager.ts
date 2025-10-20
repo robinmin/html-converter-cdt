@@ -248,8 +248,8 @@ export class MemoryManager {
       return { trend: "stable", rate: 0, samples: recentStats.length }
     }
 
-    const first = recentStats[0]
-    const last = recentStats[recentStats.length - 1]
+    const first = recentStats[0]!
+    const last = recentStats[recentStats.length - 1]!
     const timeDiff = (last.timestamp - first.timestamp) / (1000 * 60) // minutes
     const memDiff = (last.used - first.used) / (1024 * 1024) // MB
 

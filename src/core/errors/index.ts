@@ -33,20 +33,20 @@
  */
 
 // Core error classes
-export { ConversionError } from "./conversion-error.js"
-export type { ConversionErrorOptions, ErrorContext } from "./conversion-error.js"
+export { ConversionError, createConversionError, getCategoryFromCode, getSeverityFromCode, isConversionError } from "./conversion-error.js"
+export type { ErrorCategory, ErrorCode, ErrorContext, ErrorSeverity } from "./conversion-error.js"
 
 // Error codes and definitions
-export { ERROR_MESSAGES, ErrorCode } from "./error-codes.js"
-export type { ErrorInfo, RecoveryStrategy } from "./error-codes.js"
+export { ERROR_MESSAGES, ErrorCategory as ErrorCategoryEnum, ErrorCode as ErrorCodeEnum, ErrorSeverity as ErrorSeverityEnum, getErrorMessage, getErrorMetadata, getRecoveryStrategy, isRetryableError } from "./error-codes.js"
+export type { ErrorMessage, RecoveryStrategy } from "./error-codes.js"
 
 // Error handling and normalization
-export { ErrorHandler } from "./error-handler.js"
-export type { ErrorHandlerOptions } from "./error-handler.js"
+export { createErrorHandler, defaultErrorHandler, ErrorHandler, ErrorSource, handleError } from "./error-handler.js"
+export type { ErrorHandlerConfig, ErrorMetrics, ErrorNormalizationResult } from "./error-handler.js"
 
 // Error recovery mechanisms
-export { ErrorRecovery } from "./error-recovery.js"
-export type { RecoveryOptions, RecoveryResult } from "./error-recovery.js"
+export { CircuitState, ContextManager, defaultContextManager, defaultRecoveryManager, ErrorRecovery, RecoveryManager, RecoveryStrategy as RecoveryStrategyEnum } from "./error-recovery.js"
+export type { CircuitBreakerConfig, ContextEnhancementConfig, RateLimiterConfig, RecoveryResult, RetryConfig } from "./error-recovery.js"
 
 // Error simulation utilities for testing
 export { createMockChromeError, createMockFileSystemError, createMockNetworkError, ErrorScenarios, ErrorSimulator } from "./error-simulation.js"

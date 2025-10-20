@@ -238,8 +238,13 @@ export class MemoryManager {
 
         // Process each item in the chunk
         for (let j = 0; j < chunk.length; j++) {
+          const item = chunk[j]
+          if (item === undefined) {
+            continue
+          }
+
           try {
-            const result = await processor.processChunk(chunk[j], chunkIndex * chunkSize + j)
+            const result = await processor.processChunk(item as any, chunkIndex * chunkSize + j)
             results.push(result)
           } catch (error) {
             if (processor.onError) {
@@ -322,7 +327,9 @@ export class MemoryManager {
             await processor(chunk as any)
           }
         } catch (error) {
-          stream.destroy()
+          if ("destroy" in stream && typeof stream.destroy === "function") {
+            stream.destroy()
+          }
           reject(error)
         }
       })

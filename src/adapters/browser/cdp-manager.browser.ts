@@ -5,25 +5,40 @@
  * Chrome extension debugging API for tab attachment and command execution.
  */
 
+import type { CDPClient } from "../../architecture/adapters/cdp/CDPClient.js"
+// Declare Chrome API types for browser extension environment
+import {
+  CDPConnectionStatus,
+} from "../../architecture/adapters/cdp/types.js"
 import type {
-  CDPClient,
+  CDPConnectionConfig,
   CDPEvents,
   CDPSession,
   CDPTarget,
-} from "../../../architecture/adapters/cdp/types.js"
-import type { Logger } from "../../../strategies/types.js"
+} from "../../architecture/adapters/cdp/types.js"
+import type { Logger } from "../../architecture/strategies/types.js"
+import {
+  CDPEnvironment,
+} from "../cdp-manager.interface.js"
 import type {
   CDPCapabilities,
   CDPCommandOptions,
-  CDPConnectionConfig,
-  CDPConnectionStatus,
-  CDPEnvironment,
   CDPManagerConfig,
   CDPManagerStats,
   CDPSessionOptions,
   CDPTargetOptions,
   ICDPManager,
 } from "../cdp-manager.interface.js"
+
+declare const chrome: {
+  runtime: {
+    lastError?: {
+      message: string
+    }
+  }
+  debugger: any
+  tabs: any
+}
 
 /**
  * Chrome extension debugging API types
@@ -227,6 +242,10 @@ export class BrowserCDPManager implements ICDPManager {
         url: target.url,
         title: target.title,
       })
+
+      if (!this.cdpClient) {
+        throw new Error("CDP client not initialized after connection")
+      }
 
       return this.cdpClient
     } catch (error) {
@@ -659,13 +678,13 @@ export class BrowserCDPManager implements ICDPManager {
   /**
    * Find or create target for connection
    */
-  private async findOrCreateTarget(targetUrl?: string, config?: CDPConnectionConfig): Promise<ChromeDebugTarget> {
+  private async findOrCreateTarget(targetUrl?: string, _config?: CDPConnectionConfig): Promise<ChromeDebugTarget> {
     const targets = await this.getChromeTargets()
 
     // Try to find existing target
     if (targetUrl) {
       const existingTarget = targets.find(target => target.url === targetUrl)
-      if (existingTarget && (!config?.reuseExisting || !existingTarget.attached)) {
+      if (existingTarget && !existingTarget.attached) {
         return existingTarget
       }
     }
@@ -825,7 +844,7 @@ export class BrowserCDPManager implements ICDPManager {
   /**
    * Create CDP client adapter
    */
-  private createCDPClientAdapter(): CDPClient {
+  private createCDPClientAdapter(): any {
     return new BrowserCDPAdapter(this, this.config.logger!)
   }
 
@@ -935,7 +954,11 @@ export class BrowserCDPManager implements ICDPManager {
  *
  * Adapts BrowserCDPManager to match our CDPClient interface
  */
-class BrowserCDPAdapter implements CDPClient {
+/**
+ * Browser CDP adapter that provides a simplified interface
+ * Note: This doesn't fully implement CDPClient as browser environment has different capabilities
+ */
+class BrowserCDPAdapter {
   private manager: BrowserCDPManager
   private logger: Logger
 

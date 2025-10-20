@@ -21,15 +21,12 @@ export {
   type IFileProcessor,
 } from "./FileOperationsManager.js"
 
-// Memory management
+// Memory management (Note: MemoryManager, MemoryStats, MemoryThresholds exported from performance/index.js)
 export {
   type ChunkProcessor,
   type IMemoryAwareProcessor,
-  MemoryManager,
   type MemoryOptimizationOptions,
   type MemoryPressureEvent,
-  type MemoryStats,
-  type MemoryThresholds,
 } from "./MemoryManager.js"
 
 // Secure file management

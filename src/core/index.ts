@@ -37,6 +37,7 @@ export { defaultRecoveryManager, RecoveryManager } from "./errors/error-recovery
 export type { CircuitBreakerConfig, ContextEnhancementConfig, RateLimiterConfig, RecoveryResult, RecoveryStrategy as RecoveryStrategyType, RetryConfig } from "./errors/error-recovery.js"
 // Performance exports
 export * from "./performance/index.js"
+
 // Progressive enhancement exports
 export { ProgressiveEnhancementManager } from "./ProgressiveEnhancementManager.js"
 

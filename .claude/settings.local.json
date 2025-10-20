@@ -49,7 +49,10 @@
       "Bash(npm view:*)",
       "WebSearch",
       "Bash(cut:*)",
-      "SlashCommand(/sc:implement:*)"
+      "SlashCommand(/sc:implement:*)",
+      "Bash(node_modules/.bin/eslint:*)",
+      "Bash(eslint:*)",
+      "Read(//Users/robin/node_modules/**)"
     ],
     "deny": [
       "Bash(git commit:*)",
@@ -65,8 +68,13 @@
       "Bash(git restore:*)",
       "Bash(git rm:*)"
     ],
-    "ask": ["Bash(git checkout:*)", "Bash(cat -n)"]
+    "ask": [
+      "Bash(git checkout:*)",
+      "Bash(cat -n)"
+    ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["task-master-ai"]
+  "enabledMcpjsonServers": [
+    "task-master-ai"
+  ]
 }

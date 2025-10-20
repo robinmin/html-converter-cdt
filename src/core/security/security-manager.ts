@@ -445,7 +445,6 @@ export class SecurityManager {
    */
   private validateUrl(url: string): string {
     const validation = this.inputValidator.validateURL(url, {
-      allowedProtocols: ["http", "https"],
       allowPrivateIPs: this.config.network.allowPrivateIPs,
       allowLocalhost: this.config.network.allowLocalhost,
       allowedDomains: this.config.network.allowedDomains,
@@ -457,11 +456,11 @@ export class SecurityManager {
         "Invalid URL",
         "network",
         "error",
-        { reason: validation.reason, url: url.substring(0, 100) },
+        { reason: validation.errorMessage, url: url.substring(0, 100) },
       )
     }
 
-    return validation.sanitized!
+    return validation.sanitizedValue!
   }
 
   /**
@@ -472,9 +471,6 @@ export class SecurityManager {
   private validateFilePath(filePath: string): string {
     const validation = this.inputValidator.validateFilePath(filePath, {
       allowedExtensions: this.config.fileSystem.allowedExtensions,
-      blockedPatterns: this.config.fileSystem.blockedPatterns,
-      maxSize: this.config.fileSystem.maxFileSize,
-      enforcePermissions: this.config.fileSystem.enforcePermissions,
     })
 
     if (!validation.isValid) {
@@ -482,11 +478,11 @@ export class SecurityManager {
         "Invalid file path",
         "filesystem",
         "error",
-        { reason: validation.reason, filePath: filePath.substring(0, 100) },
+        { reason: validation.errorMessage, filePath: filePath.substring(0, 100) },
       )
     }
 
-    return validation.sanitized!
+    return validation.sanitizedValue!
   }
 
   /**
@@ -497,8 +493,6 @@ export class SecurityManager {
   private validateGeneralInput(input: string): string {
     const validation = this.inputValidator.validateInput(input, {
       maxLength: 10000,
-      allowHtml: false,
-      sanitizeInput: true,
     })
 
     if (!validation.isValid) {
@@ -506,11 +500,11 @@ export class SecurityManager {
         "Invalid input",
         "validation",
         "error",
-        { reason: validation.reason, inputLength: input.length },
+        { reason: validation.errorMessage, inputLength: input.length },
       )
     }
 
-    return validation.sanitized!
+    return validation.sanitizedValue!
   }
 
   /**
@@ -684,7 +678,7 @@ export class SecurityManager {
         : severity === "error"
           ? "error"
           : severity === "warning" ? "warn" : "info"
-      this.logger[logMethod](`[SECURITY] ${message}`, event)
+      this.logger[logMethod](`[SECURITY] ${message}`, event as any)
     }
 
     // TODO: Log to file if enabled
@@ -712,13 +706,13 @@ export class SecurityManager {
         allowLocalhost: this.config.network.allowLocalhost,
         networkTimeout: this.config.network.networkTimeout,
         maxRequestSize: this.config.network.maxRequestSize,
-        allowedDomains: this.config.network.allowedDomains.length,
-        blockedDomains: this.config.network.blockedDomains.length,
+        allowedDomains: this.config.network.allowedDomains,
+        blockedDomains: this.config.network.blockedDomains,
       },
       fileSystem: {
         maxFileSize: this.config.fileSystem.maxFileSize,
-        allowedExtensions: this.config.fileSystem.allowedExtensions.length,
-        blockedPatterns: this.config.fileSystem.blockedPatterns.length,
+        allowedExtensions: this.config.fileSystem.allowedExtensions,
+        blockedPatterns: this.config.fileSystem.blockedPatterns,
         enforcePermissions: this.config.fileSystem.enforcePermissions,
       },
       chrome: {

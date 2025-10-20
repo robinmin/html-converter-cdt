@@ -7,7 +7,8 @@
 
 import { Buffer } from "node:buffer"
 import { randomBytes } from "node:crypto"
-import { chmodSync, createReadStream, createWriteStream, existsSync, mkdirSync, readFileSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs"
+import { chmodSync, createReadStream, createWriteStream, existsSync, mkdirSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs"
+import { readFile as readFileAsync, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
 import process from "node:process"
@@ -186,7 +187,6 @@ export class SecureFileManager {
       suffix = "",
       mode = 0o600,
       cleanupOnExit = true,
-      _createDir = true,
     } = options
 
     // Create temporary directory if needed
@@ -276,7 +276,7 @@ export class SecureFileManager {
 
       // Write with timeout
       await this.withTimeout(
-        writeFileSync(filePath, data, { encoding, mode }),
+        writeFile(filePath, data, { encoding, mode }),
         timeout,
         `Write operation timed out for file: ${filePath}`,
       )
@@ -330,7 +330,7 @@ export class SecureFileManager {
 
       // Read with timeout
       const data = await this.withTimeout(
-        readFileSync(filePath, { encoding }),
+        readFileAsync(filePath, { encoding }),
         timeout,
         `Read operation timed out for file: ${filePath}`,
       )
@@ -360,7 +360,6 @@ export class SecureFileManager {
     options: StreamingOptions & FileOperationOptions = {},
   ): Promise<StreamResult> {
     const {
-      _chunkSize = 64 * 1024, // 64KB chunks
       highWaterMark = 1024 * 1024, // 1MB buffer
       onProgress,
       transform,
@@ -368,6 +367,7 @@ export class SecureFileManager {
       maxSize = 1024 * 1024 * 1024, // 1GB default
       createDir = true,
     } = options
+    const _chunkSize = 64 * 1024 // 64KB chunks
 
     const startTime = Date.now()
     let bytesRead = 0
@@ -450,7 +450,7 @@ export class SecureFileManager {
       })
 
       // Build pipeline
-      const streams: NodeJS.ReadableStream[] = [sourceStream, progressTransform]
+      const streams: Array<NodeJS.ReadableStream | NodeJS.WritableStream> = [sourceStream, progressTransform]
       if (transformStream) {
         streams.push(transformStream)
       }
@@ -628,22 +628,16 @@ export class SecureFileManager {
    * Execute operation with timeout
    */
   private async withTimeout<T>(
-    operation: T,
+    operation: Promise<T>,
     timeoutMs: number,
     timeoutMessage: string,
   ): Promise<T> {
-    if (typeof operation === "object" && typeof operation.then === "function") {
-      // It's already a promise
-      return Promise.race([
-        operation as Promise<T>,
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs),
-        ),
-      ])
-    }
-
-    // Sync operation, just return it
-    return operation
+    return Promise.race([
+      operation,
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs),
+      ),
+    ])
   }
 
   /**

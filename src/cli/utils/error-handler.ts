@@ -38,9 +38,9 @@ function handleConversionError(error: ConversionError, program: Command): void {
   console.error(chalk.red(error.message))
 
   // Show recovery suggestions if available
-  if (error.recoverySuggestions.length > 0) {
+  if ("recoverySuggestions" in error && Array.isArray((error as any).recoverySuggestions) && (error as any).recoverySuggestions.length > 0) {
     console.error(chalk.yellow("\n💡 Recovery suggestions:"))
-    error.recoverySuggestions.forEach((suggestion, index) => {
+    ;(error as any).recoverySuggestions.forEach((suggestion: string, index: number) => {
       console.error(chalk.yellow(`  ${index + 1}. ${suggestion}`))
     })
   }

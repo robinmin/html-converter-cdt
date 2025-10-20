@@ -99,6 +99,8 @@ export interface SecurityValidationResult {
   recommendations: string[]
   /** Sanitized input */
   sanitizedInput?: string
+  /** Security warnings */
+  warnings?: string[]
 }
 
 /**
@@ -646,7 +648,7 @@ export class InputValidator {
    */
   private isIPInRange(ip: number[], start: number[], end: number[]): boolean {
     for (let i = 0; i < 4; i++) {
-      if (ip[i] < start[i] || ip[i] > end[i]) {
+      if (ip[i]! < start[i]! || ip[i]! > end[i]!) {
         return false
       }
     }

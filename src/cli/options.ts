@@ -8,7 +8,21 @@
 import chalk from "chalk"
 
 import type { ConversionFormat } from "../api/index.js"
-import type { Config, DOCXOptions, ImageOptions, MarkdownOptions, MHTMLOptions, PDFOptions } from "../config/schema.js"
+import {
+  DEFAULT_DOCX_CONFIG,
+  DEFAULT_IMAGE_CONFIG,
+  DEFAULT_MARKDOWN_CONFIG,
+  DEFAULT_MHTML_CONFIG,
+  DEFAULT_PDF_CONFIG,
+} from "../config/defaults.js"
+import type {
+  Config,
+  DOCXConfig,
+  ImageConfig,
+  MarkdownConfig,
+  MHTMLConfig,
+  PDFConfig,
+} from "../config/schema.js"
 
 /**
  * Parse output format from options or file extension
@@ -54,24 +68,24 @@ export function buildConversionOptions(
   config: Config,
 ): any {
   const baseOptions = {
-    timeout: Number.parseInt(cliOptions.timeout) || config.conversion.timeout || 30000,
-    maxRetries: Number.parseInt(cliOptions.maxRetries) || config.conversion.maxRetries || 3,
-    keepMhtml: cliOptions.keepMhtml || config.conversion.keepMhtml || false,
-    mhtmlPath: cliOptions.mhtmlPath || config.conversion.mhtmlPath,
+    timeout: Number.parseInt(cliOptions.timeout) || config.base?.timeout || 30000,
+    maxRetries: Number.parseInt(cliOptions.maxRetries) || config.base?.maxRetries || 3,
+    keepMhtml: cliOptions.keepMhtml || false,
+    mhtmlPath: cliOptions.mhtmlPath,
   }
 
   switch (format) {
     case "pdf":
-      return buildPDFOptions(cliOptions, config.pdf || {}, baseOptions)
+      return buildPDFOptions(cliOptions, config.pdf || DEFAULT_PDF_CONFIG, baseOptions)
     case "png":
     case "jpeg":
-      return buildImageOptions(format, cliOptions, config.image || {}, baseOptions)
-    case "md":
-      return buildMarkdownOptions(cliOptions, config.markdown || {}, baseOptions)
+      return buildImageOptions(format, cliOptions, config.image || DEFAULT_IMAGE_CONFIG, baseOptions)
+    case "markdown":
+      return buildMarkdownOptions(cliOptions, config.markdown || DEFAULT_MARKDOWN_CONFIG, baseOptions)
     case "docx":
-      return buildDOCXOptions(cliOptions, config.docx || {}, baseOptions)
+      return buildDOCXOptions(cliOptions, config.docx || DEFAULT_DOCX_CONFIG, baseOptions)
     case "mhtml":
-      return buildMHTMLOptions(cliOptions, config.mhtml || {}, baseOptions)
+      return buildMHTMLOptions(cliOptions, config.mhtml || DEFAULT_MHTML_CONFIG, baseOptions)
     default:
       throw new Error(`Unsupported format: ${format}`)
   }
@@ -80,15 +94,15 @@ export function buildConversionOptions(
 /**
  * Build PDF-specific options
  */
-function buildPDFOptions(cliOptions: any, config: PDFOptions, baseOptions: any): any {
+function buildPDFOptions(cliOptions: any, config: PDFConfig, baseOptions: any): any {
   return {
     ...baseOptions,
-    format: cliOptions.pageSize || config.format || "A4",
-    landscape: cliOptions.landscape || config.landscape || false,
+    format: cliOptions.pageSize || config.pageSize || "A4",
+    landscape: cliOptions.landscape || (config.layout === "single-page") || false,
     printBackground: !cliOptions.noBackground && (config.printBackground !== false),
     scale: Number.parseFloat(cliOptions.scale) || config.scale || 1.0,
-    margin: parseMargin(cliOptions.margin || config.margin || "20px"),
-    pageRanges: cliOptions.pageRanges || config.pageRanges,
+    margin: parseMargin(cliOptions.margin || "20px"),
+    pageRanges: cliOptions.pageRanges,
     headerTemplate: cliOptions.headerTemplate || config.headerTemplate,
     footerTemplate: cliOptions.footerTemplate || config.footerTemplate,
     preferCSSPageSize: cliOptions.preferCSSPageSize || config.preferCSSPageSize || false,
@@ -98,30 +112,30 @@ function buildPDFOptions(cliOptions: any, config: PDFOptions, baseOptions: any):
 /**
  * Build image-specific options
  */
-function buildImageOptions(format: ConversionFormat, cliOptions: any, config: ImageOptions, baseOptions: any): any {
-  const [width, height] = parseViewport(cliOptions.viewport || config.viewport || "1920x1080")
+function buildImageOptions(format: ConversionFormat, cliOptions: any, config: ImageConfig, baseOptions: any): any {
+  const viewportStr = cliOptions.viewport || `${config.viewport.width}x${config.viewport.height}` || "1920x1080"
+  const [width, height] = parseViewport(viewportStr)
 
   return {
     ...baseOptions,
     quality: Math.min(100, Math.max(1, Number.parseInt(cliOptions.quality) || config.quality || 90)),
     type: format.toUpperCase() as "PNG" | "JPEG",
     omitBackground: cliOptions.omitBackground || config.omitBackground || false,
-    clip: parseClip(cliOptions.clip || config.clip),
+    clip: parseClip(cliOptions.clip),
     viewport: { width, height },
-    fullPage: cliOptions.fullPage || config.fullPage !== false,
+    fullPage: cliOptions.fullPage || config.captureBeyondViewport !== false,
   }
 }
 
 /**
  * Build markdown-specific options
  */
-function buildMarkdownOptions(cliOptions: any, config: MarkdownOptions, baseOptions: any): any {
+function buildMarkdownOptions(cliOptions: any, config: MarkdownConfig, baseOptions: any): any {
   return {
     ...baseOptions,
     flavor: cliOptions.flavor || config.flavor || "gfm",
     embedImages: !cliOptions.noEmbedImages && (config.embedImages !== false),
     imageAssetPath: cliOptions.imageAssetPath || config.imageAssetPath,
-    preserveFormatting: cliOptions.preserveFormatting || config.preserveFormatting !== false,
     codeBlockStyle: cliOptions.codeBlockStyle || config.codeBlockStyle || "fenced",
     fence: cliOptions.fence || config.fence || "```",
   }
@@ -130,29 +144,28 @@ function buildMarkdownOptions(cliOptions: any, config: MarkdownOptions, baseOpti
 /**
  * Build DOCX-specific options
  */
-function buildDOCXOptions(cliOptions: any, config: DOCXOptions, baseOptions: any): any {
+function buildDOCXOptions(cliOptions: any, config: DOCXConfig, baseOptions: any): any {
   return {
     ...baseOptions,
     preserveStyle: cliOptions.preserveStyle || config.preserveStyle || false,
     fontFamily: cliOptions.fontFamily || config.fontFamily || "Arial",
     fontSize: Number.parseInt(cliOptions.fontSize) || config.fontSize || 11,
-    orientation: cliOptions.orientation || config.orientation || "portrait",
-    pageSize: cliOptions.pageSize || config.pageSize || "A4",
-    margins: parseMargin(cliOptions.margins || config.margins || "20px"),
+    orientation: cliOptions.orientation || config.pageLayout.orientation || "portrait",
+    pageSize: cliOptions.pageSize || config.pageLayout.size || "A4",
+    margins: parseMargin(cliOptions.margins || "20px"),
   }
 }
 
 /**
  * Build MHTML-specific options
  */
-function buildMHTMLOptions(cliOptions: any, config: MHTMLOptions, baseOptions: any): any {
+function buildMHTMLOptions(cliOptions: any, config: MHTMLConfig, baseOptions: any): any {
   return {
     ...baseOptions,
-    embedResources: cliOptions.embedResources !== false && (config.embedResources !== false),
+    compressResources: cliOptions.compressResources !== false && (config.compressResources !== false),
     maxResourceSize: cliOptions.maxResourceSize || config.maxResourceSize || 10 * 1024 * 1024, // 10MB
-    timeout: cliOptions.resourceTimeout || config.resourceTimeout || 30000,
-    userAgent: cliOptions.userAgent || config.userAgent,
-    excludeExternalResources: cliOptions.excludeExternalResources || config.excludeExternalResources || false,
+    timeout: cliOptions.resourceTimeout || config.timeoutPerResource || 30000,
+    encoding: cliOptions.encoding || config.encoding || "base64",
   }
 }
 
@@ -189,8 +202,8 @@ function parseViewport(viewport: string): [number, number] {
     throw new Error(`Invalid viewport format: ${viewport}. Use format like "1920x1080".`)
   }
 
-  const width = Number.parseInt(match[1])
-  const height = Number.parseInt(match[2])
+  const width = Number.parseInt(match[1]!)
+  const height = Number.parseInt(match[2]!)
 
   if (width <= 0 || height <= 0) {
     throw new Error(`Viewport dimensions must be positive numbers.`)
@@ -213,7 +226,7 @@ function parseClip(clip?: string): any {
   }
 
   const [x, y, width, height] = parts
-  if (width <= 0 || height <= 0) {
+  if (width! <= 0 || height! <= 0) {
     throw new Error(`Clip dimensions must be positive numbers.`)
   }
 
@@ -229,8 +242,8 @@ function extensionToFormat(extension: string): ConversionFormat | null {
     png: "png",
     jpg: "jpeg",
     jpeg: "jpeg",
-    md: "md",
-    markdown: "md",
+    md: "markdown",
+    markdown: "markdown",
     docx: "docx",
     mhtml: "mhtml",
     mht: "mhtml",
@@ -250,7 +263,7 @@ function isValidFormat(format: string): format is ConversionFormat {
  * Get list of valid formats
  */
 function getValidFormats(): ConversionFormat[] {
-  return ["pdf", "png", "jpeg", "md", "docx", "mhtml"]
+  return ["pdf", "png", "jpeg", "markdown", "docx", "mhtml"]
 }
 
 /**
@@ -281,7 +294,7 @@ ${chalk.cyan("JPEG Options:")}
   --viewport <WxH>        Viewport size (e.g., 1920x1080) [default: 1920x1080]
   --clip <x,y,w,h>        Clip region`,
 
-    md: `
+    markdown: `
 ${chalk.cyan("Markdown Options:")}
   --flavor <type>         Markdown flavor (gfm, commonmark) [default: gfm]
   --no-embed-images       Don't embed images as base64

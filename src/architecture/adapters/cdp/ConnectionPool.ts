@@ -1,5 +1,6 @@
 import { CDPClient } from "./CDPClient.js"
 import type {
+  CDPConnectionConfig,
   CDPConnectionPoolConfig,
   CDPLogger,
 } from "./types.js"
@@ -33,12 +34,11 @@ export class CDPConnectionPool {
 
   constructor(config: CDPConnectionPoolConfig, logger: CDPLogger) {
     this.config = {
-      maxConnections: 5,
-      connectionTimeout: 30000,
-      idleTimeout: 300000, // 5 minutes
-      enableHealthChecks: true,
-      healthCheckInterval: 60000, // 1 minute
-      ...config,
+      maxConnections: config.maxConnections ?? 5,
+      connectionTimeout: config.connectionTimeout ?? 30000,
+      idleTimeout: config.idleTimeout ?? 300000, // 5 minutes
+      enableHealthChecks: config.enableHealthChecks ?? true,
+      healthCheckInterval: config.healthCheckInterval ?? 60000, // 1 minute
     }
     this.logger = logger
 

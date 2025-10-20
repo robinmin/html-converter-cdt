@@ -34,7 +34,6 @@ import process from "node:process"
 
 import type { ErrorContext } from "./conversion-error.js"
 import { ConversionError, ErrorCategory, ErrorCode, ErrorSeverity } from "./conversion-error.js"
-import type { ErrorHandlerOptions } from "./error-handler.js"
 import { ErrorHandler } from "./error-handler.js"
 import { ErrorRecovery } from "./error-recovery.js"
 
@@ -80,7 +79,7 @@ export class ErrorIntegration {
     options: {
       context?: string
       retries?: number
-      errorHandler?: ErrorHandlerOptions
+      errorHandler?: any
     } = {},
   ): Promise<T> {
     const context = options.context || this.config.defaultContext
@@ -95,10 +94,12 @@ export class ErrorIntegration {
       } catch (error) {
         lastError = this.errorHandler.normalizeError(error, {
           operation: context,
-          attempt: attempt + 1,
-          maxAttempts: retries + 1,
-          timestamp: new Date().toISOString(),
-          ...errorHandlerOptions, // Spread the error handler options to include metadata
+          metadata: {
+            attempt: attempt + 1,
+            maxAttempts: retries + 1,
+            timestamp: new Date().toISOString(),
+            ...(errorHandlerOptions.metadata || {}),
+          },
         })
 
         this.config.logger(lastError, context)
@@ -125,9 +126,11 @@ export class ErrorIntegration {
     return (error: Error, req: any, res: any, _next: any) => {
       const conversionError = this.errorHandler.normalizeError(error, {
         operation: `${req.method} ${req.path}`,
-        userAgent: req.get("User-Agent"),
-        ip: req.ip,
-        timestamp: new Date().toISOString(),
+        metadata: {
+          userAgent: req.get("User-Agent"),
+          ip: req.ip,
+          timestamp: new Date().toISOString(),
+        },
       })
 
       this.config.logger(conversionError, "HTTP request")
@@ -137,7 +140,7 @@ export class ErrorIntegration {
       res.status(statusCode).json({
         error: {
           code: conversionError.code,
-          message: conversionError.userMessage,
+          message: conversionError.getUserMessage(),
           timestamp: conversionError.timestamp,
           requestId: req.id || "unknown",
         },
@@ -168,6 +171,7 @@ export class ErrorIntegration {
       }
 
       // Create new ConversionError with updated metadata
+      newMetadata.timestamp = new Date().toISOString()
       const newError = new ConversionError(
         error.message,
         error.code,
@@ -177,7 +181,6 @@ export class ErrorIntegration {
           ...error.context,
           metadata: newMetadata,
           operation: context,
-          timestamp: new Date().toISOString(),
         },
         error.originalError,
         error.timestamp,
@@ -190,8 +193,10 @@ export class ErrorIntegration {
     // For raw errors, normalize them and add CDP context
     const cdpError = this.errorHandler.normalizeError(error, {
       operation: context,
-      metadata: { source: "chrome-devtools-protocol" },
-      timestamp: new Date().toISOString(),
+      metadata: {
+        source: "chrome-devtools-protocol",
+        timestamp: new Date().toISOString(),
+      },
     })
 
     // Add CDP-specific context from raw error
@@ -212,9 +217,11 @@ export class ErrorIntegration {
   processFileSystemError(error: NodeJS.ErrnoException, operation: string, filePath?: string): ConversionError {
     const fsError = this.errorHandler.normalizeError(error, {
       operation,
-      filePath,
-      source: "file-system",
-      timestamp: new Date().toISOString(),
+      resource: filePath,
+      metadata: {
+        source: "file-system",
+        timestamp: new Date().toISOString(),
+      },
     })
 
     // Add file system specific context
@@ -248,8 +255,10 @@ export class ErrorIntegration {
       process: (error: Error, context?: string) =>
         this.errorHandler.normalizeError(error, {
           operation: context || `${domain} error`,
-          metadata: { domain },
-          timestamp: new Date().toISOString(),
+          metadata: {
+            domain,
+            timestamp: new Date().toISOString(),
+          },
         }),
 
       log: (error: ConversionError, context?: string) =>
@@ -263,7 +272,7 @@ export class ErrorIntegration {
     }
 
     // Don't retry on validation errors
-    if (error.code === ErrorCode.INVALID_OPTIONS || error.code === ErrorCode.OPTION_VALIDATION_FAILED) {
+    if (error.code === ErrorCode.INVALID_OPTIONS) {
       return false
     }
 
@@ -304,7 +313,7 @@ export class ErrorIntegration {
   }
 
   private defaultLogger(error: ConversionError, context?: string): void {
-    const logMessage = `[${context || "Error"}] ${error.code}: ${error.userMessage}`
+    const logMessage = `[${context || "Error"}] ${error.code}: ${error.getUserMessage()}`
 
     if (error.severity === ErrorSeverity.CRITICAL || error.severity === ErrorSeverity.HIGH) {
       console.error(logMessage)
@@ -348,7 +357,10 @@ export function withErrorContext<T extends any[], R>(
 
       throw errorHandler.normalizeError(error as Error, {
         ...context,
-        timestamp: new Date().toISOString(),
+        metadata: {
+          ...context.metadata,
+          timestamp: new Date().toISOString(),
+        },
       })
     }
   }
@@ -381,9 +393,11 @@ export function withRetry<T extends any[], R>(
         const errorHandler = new ErrorHandler()
         lastError = errorHandler.normalizeError(error as Error, {
           operation: fn.name || "anonymous function",
-          attempt: attempt + 1,
-          maxAttempts: maxRetries + 1,
-          timestamp: new Date().toISOString(),
+          metadata: {
+            attempt: attempt + 1,
+            maxAttempts: maxRetries + 1,
+            timestamp: new Date().toISOString(),
+          },
         })
 
         if (attempt === maxRetries || !retryCondition(lastError)) {
